@@ -1,0 +1,1313 @@
+{
+  "phase": "B",
+  "dry_run": true,
+  "total_candidates": 89,
+  "labelled": 59,
+  "errors": 0,
+  "metrics": {
+    "b1_diff_only": {
+      "total": 89,
+      "labelled": 59,
+      "tp": 6,
+      "fp": 0,
+      "tn": 53,
+      "fn": 0,
+      "uncertain": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "accuracy": 1.0
+    }
+  },
+  "domain_metrics": {
+    "auth": {
+      "total": 30,
+      "labelled": 30,
+      "tp": 2,
+      "fp": 0,
+      "tn": 28,
+      "fn": 0,
+      "uncertain": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "accuracy": 1.0
+    },
+    "observability": {
+      "total": 15,
+      "labelled": 15,
+      "tp": 1,
+      "fp": 0,
+      "tn": 14,
+      "fn": 0,
+      "uncertain": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "accuracy": 1.0
+    },
+    "devops": {
+      "total": 14,
+      "labelled": 14,
+      "tp": 3,
+      "fp": 0,
+      "tn": 11,
+      "fn": 0,
+      "uncertain": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "accuracy": 1.0
+    }
+  },
+  "results": [
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 38028,
+      "title": "chore(deps): update module github.com/go-swagger/go-swagger to v0.34.0",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 37982,
+      "title": "feat(api): add q parameter to list branches API for server-side filtering",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 37873,
+      "title": "chore: Move import path from code.gitea.io/gitea to gitea.dev",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 37782,
+      "title": "fix(api): handle partial failures in push mirror synchronization gracefully",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 36514,
+      "title": "feat: Add bypass allowlist for branch protection",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 37410,
+      "title": "feat: Add default PR branch update style setting",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 37672,
+      "title": "feat(api): add sort and order query parameters to job list endpoints",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 37566,
+      "title": "feat(api): add last_sync to repository API",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 37468,
+      "title": "Add mirror auth updates to repo edit API and settings",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 36784,
+      "title": "Allow multiple projects per issue and pull requests",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 37038,
+      "title": "Serve OpenAPI 3.0 spec at /openapi.v1.json",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 36683,
+      "title": "Add API endpoint to reply to pull request review comments",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 37119,
+      "title": "Introduce `ActionRunAttempt` to represent each execution of a run",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 37356,
+      "title": "Support for Custom URI Schemes in OAuth2 Redirect URIs",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 37346,
+      "title": "Fix typos",
+      "spec_file": "templates/swagger/v1_json.tmpl",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 37873,
+      "title": "chore: Move import path from code.gitea.io/gitea to gitea.dev",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 36683,
+      "title": "Add API endpoint to reply to pull request review comments",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 36776,
+      "title": "Feature: Add per-runner \u201cDisable/Pause\u201d ",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 35951,
+      "title": "Support updating branch via API",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 35610,
+      "title": "Fix diffpatch API endpoint",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 35374,
+      "title": "API: The UpdateBranch API renames a branch",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 34139,
+      "title": "Add API endpoint to request contents of multiple files simultaniously",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 34165,
+      "title": "Add API routes to lock and unlock issues",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 33545,
+      "title": "Feature: Support workflow event dispatch via API",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 33541,
+      "title": "Revert \"Feature: Support workflow event dispatch via API (#32059)\"",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 32059,
+      "title": "Feature: Support workflow event dispatch via API",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 33303,
+      "title": "Inclusion of rename organization api",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 32433,
+      "title": "Implement update branch API",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 32286,
+      "title": "Add priority to protected branch",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "go-gitea/gitea",
+      "domain": "git_forge",
+      "pr_number": 31295,
+      "title": "Add tag protection via rest api #17862",
+      "spec_file": "routers/api/v1/swagger/options.go",
+      "gt_label": null,
+      "b1_verdict": "UNCERTAIN",
+      "b1_changes": [
+        "Unsupported spec format"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3908,
+      "title": "feat: improve openapi spec",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3912,
+      "title": "feat: implement RFC 8628",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [
+        "New endpoint POST /oauth2/device/auth added",
+        "New endpoint PUT /admin/oauth2/auth/requests/device/accept added",
+        "New endpoint GET /oauth2/device/verify added"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3906,
+      "title": "fix: Correct multiple instances of 'stragegy' typo",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3907,
+      "title": "fix: JWT documentation link to point to the correct resource",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3947,
+      "title": "fix: revoke by consent request ID",
+      "spec_file": "spec/api.json",
+      "gt_label": "BREAKING",
+      "b1_verdict": "BREAKING",
+      "b1_changes": [
+        "Parameter 'consent_challenge_id' removed from DELETE /admin/oauth2/auth/sessions/consent"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3932,
+      "title": "feat: revoke token chain by consent challenge ID",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3835,
+      "title": "chore: consistently use otelx.End(); fix some incorrect API docs",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3656,
+      "title": "chore: improve context",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3705,
+      "title": "feat: add skip_logout_consent option to clients",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3693,
+      "title": "fix: remove required mark",
+      "spec_file": "spec/api.json",
+      "gt_label": "BREAKING",
+      "b1_verdict": "BREAKING",
+      "b1_changes": [
+        "Response field 'requested_scope' is no longer guaranteed (required \u2192 optional) in GET /admin/oauth2/auth/requests/login",
+        "Response field 'requested_access_token_audience' is no longer guaranteed (required \u2192 optional) in GET /admin/oauth2/auth/requests/login"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3596,
+      "title": "feat: propagate logout to identity provider",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3575,
+      "title": "feat: add support for OIDC VC",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [
+        "New endpoint POST /credentials added"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3506,
+      "title": "chore: bump deps",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3464,
+      "title": "feat: extend session lifespan on session refresh (skip=true)",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3446,
+      "title": "hperl/per-client-token-types",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4396,
+      "title": "fix(sdk): add missing enum type to autocomplete",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4365,
+      "title": "fix: add missing discriminator",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4363,
+      "title": "fix: add missing csrf_token",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4352,
+      "title": "fix: apply strategy filters in identifier first as well",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4361,
+      "title": "feat: support importing more credentials",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4354,
+      "title": "fix: add missing submit group",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4326,
+      "title": "feat: add new Division ui node attributes",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4288,
+      "title": "fix: accept login challenge in session_issuer on SPA flows",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4272,
+      "title": "feat: more extension points",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [
+        "New endpoint GET /self-service/fed-cm/parameters added",
+        "New endpoint POST /self-service/fed-cm/token added"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4268,
+      "title": "fix: add missing saml group",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4254,
+      "title": "fix: add missing captcha group",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4248,
+      "title": "chore: update docs on ListIdentities",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4244,
+      "title": "chore: refactor parameter parsing in ListIdentities and disallow combining filters",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4155,
+      "title": "feat: support android webauthn origins",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4115,
+      "title": "feat: allow listing identities by organization ID",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 125082,
+      "title": "Preferences: Add home page from system settings",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 124895,
+      "title": "IAM: Resolve team /groups from Team spec.externalGroups",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 124610,
+      "title": "Chore: remove `regionalFormat` code in backend",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 124253,
+      "title": "Preferences: Update comments in preferences spec",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 123787,
+      "title": "chore: Add updated OpenAPI specs for enterprise reporting API changes",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 122118,
+      "title": "Dashboard/DTO: Remove isStarred property",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 121995,
+      "title": "Alerting: Mark notification provisioning endpoints deprecated",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 121175,
+      "title": "OpenAPI: Regenerate report settings schema for footer fields",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 121692,
+      "title": "Alerting: Remove legacy TestReceivers endpoint and supporting code",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 121484,
+      "title": "Alerting: Declare dedicated structs for external Alertmanager APIs",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 121390,
+      "title": "Dashboards: Remove organization annotation permissions from dashboard dto",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 120538,
+      "title": "Roles: Deprecated version in writes; autoincrement instead",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 121222,
+      "title": "Dashboards: Deprecate the dashboard and folder apis in swagger",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "BREAKING",
+      "b1_verdict": "BREAKING",
+      "b1_changes": [
+        "Endpoint GET /folders/id/{folder_id} was removed"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 120499,
+      "title": "Reporting: Update openapi schema",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 120606,
+      "title": "Alerting: Deprecate provisioning alert rule endpoints",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 10889,
+      "title": "chore(libs): update go libs and hide passwords/keys [EE-6496]",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 7146,
+      "title": "feat(gpu) EE-3191 Add GPU support for containers",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 6942,
+      "title": "feat(internal-auth): ability to set minimum password length [EE-3175]",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 6637,
+      "title": "chore(endpoint/edge): small refactor and move endpoint status handler [EE-2710]",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "BREAKING",
+      "b1_verdict": "BREAKING",
+      "b1_changes": [
+        "Endpoint GET /endpoints/{id}/status was removed",
+        "New endpoint GET /endpoints/{id}/edge/status added"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 6511,
+      "title": "refactor(storidge): remove Storidge support from backend [EE-2450]",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 5594,
+      "title": "chore(doc): Remove references to deviantony gist EE-1052",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 5337,
+      "title": "feat(k8s): Introduce the ability to restrict access to default namespace (EE-745)",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 5196,
+      "title": "feat(registry): Add ProGet registry type EE-703",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 4678,
+      "title": "docs(api): document apis with swagger",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "BREAKING",
+      "b1_verdict": "BREAKING",
+      "b1_changes": [
+        "Endpoint POST /templates was removed",
+        "Endpoint DELETE /templates/{id} was removed",
+        "Endpoint POST /endpoints/{id}/job was removed",
+        "Endpoint PUT /teams/{id} was removed",
+        "Endpoint PUT /templates/{id} was removed"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 4157,
+      "title": "feat(extensions): remove rbac extension",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "BREAKING",
+      "b1_verdict": "BREAKING",
+      "b1_changes": [
+        "Endpoint GET /extensions/{id} was removed",
+        "Endpoint DELETE /extensions/{id} was removed",
+        "Endpoint POST /extensions was removed",
+        "Endpoint GET /extensions was removed",
+        "Endpoint PUT /extensions/{id} was removed"
+      ],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 4140,
+      "title": "feat(telemetry): replace GA with matomo",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 3890,
+      "title": "refactor(azure): revert removal",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 3657,
+      "title": "Merge develop to edge compute",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 3460,
+      "title": "feat(authentication/ldap): implement anonymous mode for LDAP connection",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "SKIPPED",
+      "b3_summary": {},
+      "latency_s": 0.0
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+version: "3.9"
+
+services:
+  # ── Contract Registry MCP (port 8010) ─────────────────────────────────────
+  contract-registry-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    command: uvicorn mcps.contract_registry_mcp.server:app --host 0.0.0.0 --port 8010
+    ports:
+      - "8010:8010"
+    volumes:
+      - registry_data:/data
+    environment:
+      CONTRACT_REGISTRY_DB: /data/contract_registry.db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Graph Store MCP (port 8011) ────────────────────────────────────────────
+  graph-store-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    command: uvicorn mcps.graph_store_mcp.server:app --host 0.0.0.0 --port 8011
+    ports:
+      - "8011:8011"
+    volumes:
+      - graph_data:/data
+    environment:
+      GRAPH_STORE_DB: /data/dependency_graph.db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8011/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Main Pipeline API (port 9003) ──────────────────────────────────────────
+  pipeline-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    command: uvicorn api.webhook:app --host 0.0.0.0 --port 9003 --reload
+    ports:
+      - "9003:9003"
+    volumes:
+      - pipeline_data:/data
+    environment:
+      OPENAI_API_KEY:          ${OPENAI_API_KEY}
+      GITHUB_TOKEN:            ${GITHUB_TOKEN}
+      GITHUB_WEBHOOK_SECRET:   ${GITHUB_WEBHOOK_SECRET:-}
+      CONTRACT_REGISTRY_URL:   http://contract-registry-mcp:8010
+      GRAPH_STORE_URL:         http://graph-store-mcp:8011
+      GRAPH_STORE_DB:          /data/dependency_graph.db
+      CONTRACT_REGISTRY_DB:    /data/contract_registry.db
+      PAPER1_PIPELINE_URL:     ${PAPER1_PIPELINE_URL:-}
+      SLACK_BOT_TOKEN:         ${SLACK_BOT_TOKEN:-}
+      LANGSMITH_API_KEY:       ${LANGSMITH_API_KEY:-}
+      LANGSMITH_PROJECT:       k11techlab-microservice-qa
+    depends_on:
+      contract-registry-mcp:
+        condition: service_healthy
+      graph-store-mcp:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9003/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  registry_data:
+  graph_data:
+  pipeline_data:

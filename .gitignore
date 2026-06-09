@@ -1,0 +1,10 @@
+.env
+.env.example
+*.db
+__pycache__/
+*.pyc
+.pytest_cache/
+eval/results.json
+eval/metrics.json
+eval/scenarios_manifest.json
+*.log

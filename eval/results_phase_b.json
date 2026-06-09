@@ -1,0 +1,1314 @@
+{
+  "phase": "B",
+  "dry_run": false,
+  "total_candidates": 59,
+  "labelled": 59,
+  "errors": 0,
+  "metrics": {
+    "b1_diff_only": {
+      "total": 59,
+      "labelled": 59,
+      "tp": 6,
+      "fp": 0,
+      "tn": 53,
+      "fn": 0,
+      "uncertain": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "accuracy": 1.0
+    },
+    "b3_full_pipeline": {
+      "total": 59,
+      "labelled": 59,
+      "tp": 0,
+      "fp": 0,
+      "tn": 53,
+      "fn": 6,
+      "uncertain": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "accuracy": 0.8983
+    }
+  },
+  "domain_metrics": {
+    "auth": {
+      "total": 30,
+      "labelled": 30,
+      "tp": 0,
+      "fp": 0,
+      "tn": 28,
+      "fn": 2,
+      "uncertain": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "accuracy": 0.9333
+    },
+    "observability": {
+      "total": 15,
+      "labelled": 15,
+      "tp": 0,
+      "fp": 0,
+      "tn": 14,
+      "fn": 1,
+      "uncertain": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "accuracy": 0.9333
+    },
+    "devops": {
+      "total": 14,
+      "labelled": 14,
+      "tp": 0,
+      "fp": 0,
+      "tn": 11,
+      "fn": 3,
+      "uncertain": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "accuracy": 0.7857
+    }
+  },
+  "results": [
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3908,
+      "title": "feat: improve openapi spec",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.27,
+      "raw_response": {
+        "run_id": "977b20db-cebb-4877-a88b-2a0f735494b6",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3912,
+      "title": "feat: implement RFC 8628",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [
+        "New endpoint GET /oauth2/device/verify added",
+        "New endpoint PUT /admin/oauth2/auth/requests/device/accept added",
+        "New endpoint POST /oauth2/device/auth added"
+      ],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {
+        "run_id": "c65d0066-9ccc-4a08-b90e-ea997f68c83d",
+        "provider": "hydra",
+        "pr_number": 3912,
+        "impact_score": 0.0,
+        "impact_radius": null,
+        "breaking_consumers": 0,
+        "compatible_consumers": 0,
+        "uncertain_consumers": 0,
+        "total_violations": 0,
+        "breaking_changes": 0,
+        "overall_verdict": "COMPATIBLE"
+      },
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "c65d0066-9ccc-4a08-b90e-ea997f68c83d",
+        "status": "completed",
+        "final_report": "# Cross-Repo Impact Report\n\n**Run ID:** `c65d0066-9ccc-4a08-b90e-ea997f68c83d`  \n**Provider:** `hydra`  \n**PR:** #3912  \n**Generated:** 2026-06-08 22:18 UTC  \n\n## Summary\n\n| Metric | Value |\n|--------|-------|\n| Overall Verdict | **COMPATIBLE** |\n| Impact Score | `0.000` |\n| Impact Radius | None services |\n| Breaking Consumers | 0 |\n| Compatible Consumers | 0 |\n| Uncertain Consumers | 0 |\n| Breaking Contract Changes | 0 |\n| Total Violations | 0 |\n",
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3906,
+      "title": "fix: Correct multiple instances of 'stragegy' typo",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "3c636cf9-96a8-43d3-8f78-7a16758c6c97",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3907,
+      "title": "fix: JWT documentation link to point to the correct resource",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "6146574c-3aca-45d2-abf2-0089a9891ca7",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3947,
+      "title": "fix: revoke by consent request ID",
+      "spec_file": "spec/api.json",
+      "gt_label": "BREAKING",
+      "b1_verdict": "BREAKING",
+      "b1_changes": [
+        "Parameter 'consent_challenge_id' removed from DELETE /admin/oauth2/auth/sessions/consent"
+      ],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {
+        "run_id": "20e26c12-5bbc-445c-b0fa-9bd68eafa0c1",
+        "provider": "hydra",
+        "pr_number": 3947,
+        "impact_score": 0.0,
+        "impact_radius": null,
+        "breaking_consumers": 0,
+        "compatible_consumers": 0,
+        "uncertain_consumers": 0,
+        "total_violations": 0,
+        "breaking_changes": 1,
+        "overall_verdict": "COMPATIBLE"
+      },
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "20e26c12-5bbc-445c-b0fa-9bd68eafa0c1",
+        "status": "completed",
+        "final_report": "# Cross-Repo Impact Report\n\n**Run ID:** `20e26c12-5bbc-445c-b0fa-9bd68eafa0c1`  \n**Provider:** `hydra`  \n**PR:** #3947  \n**Generated:** 2026-06-08 22:19 UTC  \n\n## Summary\n\n| Metric | Value |\n|--------|-------|\n| Overall Verdict | **COMPATIBLE** |\n| Impact Score | `0.000` |\n| Impact Radius | None services |\n| Breaking Consumers | 0 |\n| Compatible Consumers | 0 |\n| Uncertain Consumers | 0 |\n| Breaking Contract Changes | 1 |\n| Total Violations | 0 |\n\n## Breaking Contract Changes\n\n- **[HIGH]** `DELETE /admin/oauth2/auth/sessions/consent` \u2014 Parameter 'consent_challenge_id' removed from DELETE /admin/oauth2/auth/sessions/consent\n",
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3932,
+      "title": "feat: revoke token chain by consent challenge ID",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "2bd2c92c-3f5b-4d51-bfa9-33d9832bb0cd",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3835,
+      "title": "chore: consistently use otelx.End(); fix some incorrect API docs",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "f4f6584d-da26-4529-a3f6-7a8012972c3e",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3656,
+      "title": "chore: improve context",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "2e59b15e-ca23-4c68-8ab8-3eff448a397c",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3705,
+      "title": "feat: add skip_logout_consent option to clients",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "df83b2bb-bb50-4967-b827-282b860e1f4b",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3693,
+      "title": "fix: remove required mark",
+      "spec_file": "spec/api.json",
+      "gt_label": "BREAKING",
+      "b1_verdict": "BREAKING",
+      "b1_changes": [
+        "Response field 'requested_scope' is no longer guaranteed (required \u2192 optional) in GET /admin/oauth2/auth/requests/login",
+        "Response field 'requested_access_token_audience' is no longer guaranteed (required \u2192 optional) in GET /admin/oauth2/auth/requests/login"
+      ],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {
+        "run_id": "216571dc-f794-44b5-a8a7-aa152f5df725",
+        "provider": "hydra",
+        "pr_number": 3693,
+        "impact_score": 0.0,
+        "impact_radius": null,
+        "breaking_consumers": 0,
+        "compatible_consumers": 0,
+        "uncertain_consumers": 0,
+        "total_violations": 0,
+        "breaking_changes": 2,
+        "overall_verdict": "COMPATIBLE"
+      },
+      "latency_s": 3.03,
+      "raw_response": {
+        "run_id": "216571dc-f794-44b5-a8a7-aa152f5df725",
+        "status": "completed",
+        "final_report": "# Cross-Repo Impact Report\n\n**Run ID:** `216571dc-f794-44b5-a8a7-aa152f5df725`  \n**Provider:** `hydra`  \n**PR:** #3693  \n**Generated:** 2026-06-08 22:19 UTC  \n\n## Summary\n\n| Metric | Value |\n|--------|-------|\n| Overall Verdict | **COMPATIBLE** |\n| Impact Score | `0.000` |\n| Impact Radius | None services |\n| Breaking Consumers | 0 |\n| Compatible Consumers | 0 |\n| Uncertain Consumers | 0 |\n| Breaking Contract Changes | 2 |\n| Total Violations | 0 |\n\n## Breaking Contract Changes\n\n- **[MEDIUM]** `GET /admin/oauth2/auth/requests/login` \u2014 Response field 'requested_access_token_audience' is no longer guaranteed (required \u2192 optional) in GET /admin/oauth2/auth/requests/login\n- **[MEDIUM]** `GET /admin/oauth2/auth/requests/login` \u2014 Response field 'requested_scope' is no longer guaranteed (required \u2192 optional) in GET /admin/oauth2/auth/requests/login\n",
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3596,
+      "title": "feat: propagate logout to identity provider",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "789c154d-6d03-4b64-a35f-db84a8fd1c39",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3575,
+      "title": "feat: add support for OIDC VC",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [
+        "New endpoint POST /credentials added"
+      ],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {
+        "run_id": "a95a066f-1745-4e70-9c15-8709dfe6a6ea",
+        "provider": "hydra",
+        "pr_number": 3575,
+        "impact_score": 0.0,
+        "impact_radius": null,
+        "breaking_consumers": 0,
+        "compatible_consumers": 0,
+        "uncertain_consumers": 0,
+        "total_violations": 0,
+        "breaking_changes": 0,
+        "overall_verdict": "COMPATIBLE"
+      },
+      "latency_s": 3.54,
+      "raw_response": {
+        "run_id": "a95a066f-1745-4e70-9c15-8709dfe6a6ea",
+        "status": "completed",
+        "final_report": "# Cross-Repo Impact Report\n\n**Run ID:** `a95a066f-1745-4e70-9c15-8709dfe6a6ea`  \n**Provider:** `hydra`  \n**PR:** #3575  \n**Generated:** 2026-06-08 22:19 UTC  \n\n## Summary\n\n| Metric | Value |\n|--------|-------|\n| Overall Verdict | **COMPATIBLE** |\n| Impact Score | `0.000` |\n| Impact Radius | None services |\n| Breaking Consumers | 0 |\n| Compatible Consumers | 0 |\n| Uncertain Consumers | 0 |\n| Breaking Contract Changes | 0 |\n| Total Violations | 0 |\n",
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3506,
+      "title": "chore: bump deps",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "34a133a6-619e-4098-a19d-51fac576b47b",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3464,
+      "title": "feat: extend session lifespan on session refresh (skip=true)",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "7020fec1-18b6-407a-8d96-a87a1337c965",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/hydra",
+      "domain": "auth",
+      "pr_number": 3446,
+      "title": "hperl/per-client-token-types",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "4aeed60a-93b2-4e40-a0ef-042346c1e0dc",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4396,
+      "title": "fix(sdk): add missing enum type to autocomplete",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "d60da23f-cd60-4fa0-8059-7d01e6dea507",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4365,
+      "title": "fix: add missing discriminator",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.03,
+      "raw_response": {
+        "run_id": "25a6baf0-d86f-4295-92fd-bde30a589c35",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4363,
+      "title": "fix: add missing csrf_token",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "84ea0af0-5b5e-47e3-ab32-e680c2d6c58a",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4352,
+      "title": "fix: apply strategy filters in identifier first as well",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.03,
+      "raw_response": {
+        "run_id": "a5aec4bf-1676-4c83-9a2a-3c1dc9792942",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4361,
+      "title": "feat: support importing more credentials",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.04,
+      "raw_response": {
+        "run_id": "265173b2-eeba-4ba2-b543-cdd917a5e644",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4354,
+      "title": "fix: add missing submit group",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "5db33731-837c-41aa-b0a5-e12b710f1b6f",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4326,
+      "title": "feat: add new Division ui node attributes",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "523d5e46-2d0b-4b55-8cf5-ec859f5ca1db",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4288,
+      "title": "fix: accept login challenge in session_issuer on SPA flows",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "31ae4b16-bcde-4f1e-834c-228edf99d2b2",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4272,
+      "title": "feat: more extension points",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [
+        "New endpoint POST /self-service/fed-cm/token added",
+        "New endpoint GET /self-service/fed-cm/parameters added"
+      ],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {
+        "run_id": "30aea822-d4d8-4943-a9ca-c083f37f4188",
+        "provider": "kratos",
+        "pr_number": 4272,
+        "impact_score": 0.0,
+        "impact_radius": null,
+        "breaking_consumers": 0,
+        "compatible_consumers": 0,
+        "uncertain_consumers": 0,
+        "total_violations": 0,
+        "breaking_changes": 0,
+        "overall_verdict": "COMPATIBLE"
+      },
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "30aea822-d4d8-4943-a9ca-c083f37f4188",
+        "status": "completed",
+        "final_report": "# Cross-Repo Impact Report\n\n**Run ID:** `30aea822-d4d8-4943-a9ca-c083f37f4188`  \n**Provider:** `kratos`  \n**PR:** #4272  \n**Generated:** 2026-06-08 22:20 UTC  \n\n## Summary\n\n| Metric | Value |\n|--------|-------|\n| Overall Verdict | **COMPATIBLE** |\n| Impact Score | `0.000` |\n| Impact Radius | None services |\n| Breaking Consumers | 0 |\n| Compatible Consumers | 0 |\n| Uncertain Consumers | 0 |\n| Breaking Contract Changes | 0 |\n| Total Violations | 0 |\n",
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4268,
+      "title": "fix: add missing saml group",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.03,
+      "raw_response": {
+        "run_id": "9a4ea50a-07bc-466d-9ee8-9a477546eb41",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4254,
+      "title": "fix: add missing captcha group",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "3339e827-6c51-4c7b-aa6c-156180b5b9ff",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4248,
+      "title": "chore: update docs on ListIdentities",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "a0964765-46fe-41da-9a8e-ddf72329d9ab",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4244,
+      "title": "chore: refactor parameter parsing in ListIdentities and disallow combining filters",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "141f54d7-cfd1-44cc-9719-e59d933c10c7",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4155,
+      "title": "feat: support android webauthn origins",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.05,
+      "raw_response": {
+        "run_id": "5cef20ac-e4f2-4a14-b327-c9e0464033b9",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "ory/kratos",
+      "domain": "auth",
+      "pr_number": 4115,
+      "title": "feat: allow listing identities by organization ID",
+      "spec_file": "spec/api.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "90f43747-5239-43c7-9896-cd3ced05d574",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 125082,
+      "title": "Preferences: Add home page from system settings",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "c5422316-b81d-4937-9e11-b568b3894e47",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 124895,
+      "title": "IAM: Resolve team /groups from Team spec.externalGroups",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "2d7ba5fd-4885-4c4d-a9a7-b5490f9251d8",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 124610,
+      "title": "Chore: remove `regionalFormat` code in backend",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "480f194c-013c-40ea-9207-cbe22500e1d2",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 124253,
+      "title": "Preferences: Update comments in preferences spec",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.05,
+      "raw_response": {
+        "run_id": "b7911232-5ee0-4285-863a-5a209c4f3a49",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 123787,
+      "title": "chore: Add updated OpenAPI specs for enterprise reporting API changes",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "c93cb673-4121-4210-91a7-1c68923c4850",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 122118,
+      "title": "Dashboard/DTO: Remove isStarred property",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "4f47f451-617b-4558-93ba-24245cc97198",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 121995,
+      "title": "Alerting: Mark notification provisioning endpoints deprecated",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "20db1c32-b90c-44ce-a71e-ebebc9f2ced7",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 121175,
+      "title": "OpenAPI: Regenerate report settings schema for footer fields",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "8a152ec6-1515-46d4-9553-757efa6e8ba3",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 121692,
+      "title": "Alerting: Remove legacy TestReceivers endpoint and supporting code",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.61,
+      "raw_response": {
+        "run_id": "efdcfa28-a55d-494d-9ceb-7ebf1c0211d9",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 121484,
+      "title": "Alerting: Declare dedicated structs for external Alertmanager APIs",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "29043174-4d5f-42c6-88db-b372794248e4",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 121390,
+      "title": "Dashboards: Remove organization annotation permissions from dashboard dto",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.04,
+      "raw_response": {
+        "run_id": "6ffa5704-7fae-4c84-bba3-57b04d416544",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 120538,
+      "title": "Roles: Deprecated version in writes; autoincrement instead",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.03,
+      "raw_response": {
+        "run_id": "730ac010-bfb3-44a5-9ad4-d99a4a227e8f",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 121222,
+      "title": "Dashboards: Deprecate the dashboard and folder apis in swagger",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "BREAKING",
+      "b1_verdict": "BREAKING",
+      "b1_changes": [
+        "Endpoint GET /folders/id/{folder_id} was removed"
+      ],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.05,
+      "raw_response": {
+        "run_id": "a0c40789-55ad-4812-a485-5bdcece4c288",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 120499,
+      "title": "Reporting: Update openapi schema",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.03,
+      "raw_response": {
+        "run_id": "9e41a891-9319-4441-b060-bdbbd39ff29d",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "grafana/grafana",
+      "domain": "observability",
+      "pr_number": 120606,
+      "title": "Alerting: Deprecate provisioning alert rule endpoints",
+      "spec_file": "public/api-merged.json",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "a2f92f83-30c5-4fe9-a3df-d9e63177b407",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 10889,
+      "title": "chore(libs): update go libs and hide passwords/keys [EE-6496]",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.06,
+      "raw_response": {
+        "run_id": "e90f946f-7079-430a-a570-4646241cf0f0",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 7146,
+      "title": "feat(gpu) EE-3191 Add GPU support for containers",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.03,
+      "raw_response": {
+        "run_id": "08a75cfe-15ce-40e5-81d6-d7a458a7e786",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 6942,
+      "title": "feat(internal-auth): ability to set minimum password length [EE-3175]",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.04,
+      "raw_response": {
+        "run_id": "7224732f-7162-4d98-92b8-e832e4d64efe",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 6637,
+      "title": "chore(endpoint/edge): small refactor and move endpoint status handler [EE-2710]",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "BREAKING",
+      "b1_verdict": "BREAKING",
+      "b1_changes": [
+        "Endpoint GET /endpoints/{id}/status was removed",
+        "New endpoint GET /endpoints/{id}/edge/status added"
+      ],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {
+        "run_id": "fb5887b8-ea21-476f-882a-b31c072e33dd",
+        "provider": "portainer",
+        "pr_number": 6637,
+        "impact_score": 0.0,
+        "impact_radius": null,
+        "breaking_consumers": 0,
+        "compatible_consumers": 0,
+        "uncertain_consumers": 0,
+        "total_violations": 0,
+        "breaking_changes": 1,
+        "overall_verdict": "COMPATIBLE"
+      },
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "fb5887b8-ea21-476f-882a-b31c072e33dd",
+        "status": "completed",
+        "final_report": "# Cross-Repo Impact Report\n\n**Run ID:** `fb5887b8-ea21-476f-882a-b31c072e33dd`  \n**Provider:** `portainer`  \n**PR:** #6637  \n**Generated:** 2026-06-08 22:21 UTC  \n\n## Summary\n\n| Metric | Value |\n|--------|-------|\n| Overall Verdict | **COMPATIBLE** |\n| Impact Score | `0.000` |\n| Impact Radius | None services |\n| Breaking Consumers | 0 |\n| Compatible Consumers | 0 |\n| Uncertain Consumers | 0 |\n| Breaking Contract Changes | 1 |\n| Total Violations | 0 |\n\n## Breaking Contract Changes\n\n- **[CRITICAL]** `GET /endpoints/{id}/status` \u2014 Endpoint GET /endpoints/{id}/status was removed\n",
+        "error": null
+      }
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 6511,
+      "title": "refactor(storidge): remove Storidge support from backend [EE-2450]",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "9bd6b26a-5d57-4d98-a4f0-78ecc83e0773",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 5594,
+      "title": "chore(doc): Remove references to deviantony gist EE-1052",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "73595409-9f2e-4b65-9ab7-d9beceee3e06",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 5337,
+      "title": "feat(k8s): Introduce the ability to restrict access to default namespace (EE-745)",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "f3288656-4897-4235-9ace-c235267a78e4",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 5196,
+      "title": "feat(registry): Add ProGet registry type EE-703",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.03,
+      "raw_response": {
+        "run_id": "9a0f4759-1646-44ce-bf6f-4b3baa1ddee0",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 4678,
+      "title": "docs(api): document apis with swagger",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "BREAKING",
+      "b1_verdict": "BREAKING",
+      "b1_changes": [
+        "Endpoint DELETE /templates/{id} was removed",
+        "Endpoint PUT /settings/authentication/checkLDAP was removed",
+        "Endpoint GET /templates/{id} was removed",
+        "Endpoint POST /teams was removed",
+        "Endpoint PUT /teams/{id} was removed"
+      ],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "3d64ccf6-a9e8-4189-9692-477a9bf3410c",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 4157,
+      "title": "feat(extensions): remove rbac extension",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "BREAKING",
+      "b1_verdict": "BREAKING",
+      "b1_changes": [
+        "Endpoint GET /extensions/{id} was removed",
+        "Endpoint DELETE /extensions/{id} was removed",
+        "Endpoint POST /extensions was removed",
+        "Endpoint GET /extensions was removed",
+        "Endpoint PUT /extensions/{id} was removed"
+      ],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {
+        "run_id": "85e59005-3932-45d7-999a-447b07ebb145",
+        "provider": "portainer",
+        "pr_number": 4157,
+        "impact_score": 0.0,
+        "impact_radius": null,
+        "breaking_consumers": 0,
+        "compatible_consumers": 0,
+        "uncertain_consumers": 0,
+        "total_violations": 0,
+        "breaking_changes": 5,
+        "overall_verdict": "COMPATIBLE"
+      },
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "85e59005-3932-45d7-999a-447b07ebb145",
+        "status": "completed",
+        "final_report": "# Cross-Repo Impact Report\n\n**Run ID:** `85e59005-3932-45d7-999a-447b07ebb145`  \n**Provider:** `portainer`  \n**PR:** #4157  \n**Generated:** 2026-06-08 22:21 UTC  \n\n## Summary\n\n| Metric | Value |\n|--------|-------|\n| Overall Verdict | **COMPATIBLE** |\n| Impact Score | `0.000` |\n| Impact Radius | None services |\n| Breaking Consumers | 0 |\n| Compatible Consumers | 0 |\n| Uncertain Consumers | 0 |\n| Breaking Contract Changes | 5 |\n| Total Violations | 0 |\n\n## Breaking Contract Changes\n\n- **[CRITICAL]** `DELETE /extensions/{id}` \u2014 Endpoint DELETE /extensions/{id} was removed\n- **[CRITICAL]** `PUT /extensions/{id}` \u2014 Endpoint PUT /extensions/{id} was removed\n- **[CRITICAL]** `GET /extensions/{id}` \u2014 Endpoint GET /extensions/{id} was removed\n- **[CRITICAL]** `POST /extensions` \u2014 Endpoint POST /extensions was removed\n- **[CRITICAL]** `GET /extensions` \u2014 Endpoint GET /extensions was removed\n",
+        "error": null
+      }
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 4140,
+      "title": "feat(telemetry): replace GA with matomo",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.13,
+      "raw_response": {
+        "run_id": "a5249a78-fc95-4c01-8fcd-3fd12cb84f52",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 3890,
+      "title": "refactor(azure): revert removal",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.03,
+      "raw_response": {
+        "run_id": "e8c58198-db92-490d-8968-519240ffa541",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 3657,
+      "title": "Merge develop to edge compute",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.02,
+      "raw_response": {
+        "run_id": "5ab9a485-5c44-4f13-9919-6685605dfb1d",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    },
+    {
+      "repo": "portainer/portainer",
+      "domain": "devops",
+      "pr_number": 3460,
+      "title": "feat(authentication/ldap): implement anonymous mode for LDAP connection",
+      "spec_file": "api/swagger.yaml",
+      "gt_label": "COMPATIBLE",
+      "b1_verdict": "COMPATIBLE",
+      "b1_changes": [],
+      "b3_verdict": "COMPATIBLE",
+      "b3_summary": {},
+      "latency_s": 3.01,
+      "raw_response": {
+        "run_id": "12e21777-d5d2-452e-823b-c3c22c6cf9ef",
+        "status": "completed",
+        "final_report": null,
+        "error": null
+      }
+    }
+  ]
+}
