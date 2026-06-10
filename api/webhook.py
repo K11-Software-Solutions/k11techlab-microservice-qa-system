@@ -219,14 +219,19 @@ async def get_run(run_id: str):
     if run_id not in _runs:
         raise HTTPException(status_code=404, detail=f"Run {run_id} not found")
     run = _runs[run_id]
+    adjusted = run["state"].get("adjusted_compliance_results")
     return {
-        "run_id":             run_id,
-        "status":             run["status"],
-        "summary":            run["state"].get("summary"),
-        "final_report":       run["state"].get("final_report"),
-        "uncertainty_score":  run["state"].get("uncertainty_score"),
-        "uncertainty_verdict": run["state"].get("uncertainty_verdict"),
-        "error":              run.get("error"),
+        "run_id":              run_id,
+        "status":              run["status"],
+        "summary":             run["state"].get("summary"),
+        "final_report":        run["state"].get("final_report"),
+        "uncertainty_score":   run["state"].get("uncertainty_score"),
+        "uncertainty_verdict":  run["state"].get("uncertainty_verdict"),
+        "verdicts_downgraded": (
+            sum(1 for r in adjusted if "[Downgraded COMPATIBLE" in r.get("reasoning", ""))
+            if adjusted else 0
+        ),
+        "error":               run.get("error"),
     }
 
 

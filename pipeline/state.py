@@ -61,8 +61,9 @@ class MicroservicePipelineState(TypedDict):
 
     # ── Confidence propagation ───────────────────────────────────────────────
     agent_confidence_scores: Annotated[dict[str, float], _merge_confidence_dicts]
-    uncertainty_score:   float   # 0.0 = certain, 1.0 = maximally uncertain
-    uncertainty_verdict: str     # "LOW" | "MEDIUM" | "HIGH"
+    uncertainty_score:   float           # 0.0 = certain, 1.0 = maximally uncertain
+    uncertainty_verdict: str             # "LOW" | "MEDIUM" | "HIGH"
+    adjusted_compliance_results: Optional[list[dict]]  # post-downgrade snapshot; None if no adjustment
 
     # ── Phase 4: Impact report ───────────────────────────────────────────────
     summary:        Optional[dict]
@@ -100,6 +101,7 @@ def initial_state(
         hitl_reviewer=None, hitl_comment=None,
         compliance_results=[], violations=[], errors=[],
         agent_confidence_scores={}, uncertainty_score=0.0, uncertainty_verdict="LOW",
+        adjusted_compliance_results=None,
         summary=None, final_report=None,
         github_issues=None, slack_sent=None,
         pipeline_version="1.0.0", triggered_by=triggered_by,

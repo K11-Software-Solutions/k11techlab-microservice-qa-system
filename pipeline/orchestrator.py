@@ -31,7 +31,7 @@ from typing import Any
 
 from langgraph.graph import END, START, StateGraph
 
-from pipeline.confidence import aggregate_agent_confidence
+from pipeline.confidence import aggregate_agent_confidence, downgrade_compatible_verdicts
 from pipeline.hitl import (
     cross_repo_hitl_check,
     cross_repo_human_review,
@@ -48,16 +48,29 @@ logger = logging.getLogger(__name__)
 
 
 async def aggregate_confidence_node(state: MicroservicePipelineState) -> dict:
-    """Aggregate per-agent confidence scores into a single uncertainty signal."""
+    """Aggregate per-agent confidence scores and apply verdict downgrade when uncertainty is HIGH."""
     scores  = state.get("agent_confidence_scores") or {}
     summary = aggregate_agent_confidence(scores)
     logger.info(
         "Confidence aggregation — agents=%d mean=%.3f uncertainty=%.3f verdict=%s",
         len(scores), summary.mean, summary.uncertainty_score, summary.verdict,
     )
+
+    adjusted, downgrade_count = downgrade_compatible_verdicts(
+        compliance_results=state.get("compliance_results", []),
+        agent_confidence_scores=scores,
+        uncertainty_verdict=summary.verdict,
+    )
+    if downgrade_count:
+        logger.warning(
+            "Verdict downgrade: %d COMPATIBLE → UNCERTAIN (uncertainty_verdict=%s)",
+            downgrade_count, summary.verdict,
+        )
+
     return {
-        "uncertainty_score":   summary.uncertainty_score,
-        "uncertainty_verdict": summary.verdict,
+        "uncertainty_score":           summary.uncertainty_score,
+        "uncertainty_verdict":         summary.verdict,
+        "adjusted_compliance_results": adjusted if downgrade_count else None,
     }
 
 

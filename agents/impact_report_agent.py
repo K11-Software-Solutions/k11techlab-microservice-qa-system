@@ -57,29 +57,39 @@ class ImpactReportAgent(BaseMicroserviceAgent):
         pr_number  = state["pr_number"]
         provider   = repo_name.split("/")[-1]
 
-        compliance_results = state.get("compliance_results", [])
-        violations         = state.get("violations", [])
-        consumers          = state.get("downstream_consumers", [])
-        impact_score       = state.get("impact_score", 0.0) or 0.0
-        breaking_changes   = state.get("breaking_changes", [])
+        # Prefer post-downgrade verdicts (Feature 3) when available
+        compliance_results = (
+            state.get("adjusted_compliance_results")
+            or state.get("compliance_results", [])
+        )
+        violations       = state.get("violations", [])
+        consumers        = state.get("downstream_consumers", [])
+        impact_score     = state.get("impact_score", 0.0) or 0.0
+        breaking_changes = state.get("breaking_changes", [])
 
         # ── Aggregate ──────────────────────────────────────────────────────
         breaking_consumers = [r for r in compliance_results if r.get("verdict") == "BREAKING"]
         compatible         = [r for r in compliance_results if r.get("verdict") == "COMPATIBLE"]
         uncertain          = [r for r in compliance_results if r.get("verdict") == "UNCERTAIN"]
 
+        verdicts_downgraded = sum(
+            1 for r in compliance_results
+            if "[Downgraded COMPATIBLE" in r.get("reasoning", "")
+        )
         summary = {
-            "run_id":             run_id,
-            "provider":           provider,
-            "pr_number":          pr_number,
-            "impact_score":       round(impact_score, 3),
-            "impact_radius":      state.get("impact_radius", 0),
-            "breaking_consumers": len(breaking_consumers),
+            "run_id":               run_id,
+            "provider":             provider,
+            "pr_number":            pr_number,
+            "impact_score":         round(impact_score, 3),
+            "impact_radius":        state.get("impact_radius", 0),
+            "breaking_consumers":   len(breaking_consumers),
             "compatible_consumers": len(compatible),
             "uncertain_consumers":  len(uncertain),
-            "total_violations":   len(violations),
-            "breaking_changes":   len(breaking_changes),
-            "overall_verdict":    _compute_verdict(breaking_consumers, uncertain),
+            "verdicts_downgraded":  verdicts_downgraded,
+            "uncertainty_verdict":  state.get("uncertainty_verdict", "LOW"),
+            "total_violations":     len(violations),
+            "breaking_changes":     len(breaking_changes),
+            "overall_verdict":      _compute_verdict(breaking_consumers, uncertain),
         }
 
         # ── Render markdown report ─────────────────────────────────────────
@@ -265,6 +275,8 @@ def _render_report(
         f"| Breaking Consumers | {summary['breaking_consumers']} |",
         f"| Compatible Consumers | {summary['compatible_consumers']} |",
         f"| Uncertain Consumers | {summary['uncertain_consumers']} |",
+        f"| Verdicts Downgraded | {summary['verdicts_downgraded']} |",
+        f"| Agent Uncertainty | {summary['uncertainty_verdict']} |",
         f"| Breaking Contract Changes | {summary['breaking_changes']} |",
         f"| Total Violations | {summary['total_violations']} |",
         f"",

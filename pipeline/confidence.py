@@ -85,6 +85,50 @@ def aggregate_agent_confidence(scores: dict[str, float]) -> ConfidenceSummary:
     )
 
 
+CONFIDENCE_DOWNGRADE_THRESHOLD = float(os.getenv("CONFIDENCE_DOWNGRADE_THRESHOLD", "0.50"))
+
+
+def downgrade_compatible_verdicts(
+    compliance_results: list[dict],
+    agent_confidence_scores: dict[str, float],
+    uncertainty_verdict: str,
+) -> tuple[list[dict], int]:
+    """
+    When uncertainty_verdict is HIGH, downgrade each COMPATIBLE verdict whose
+    per-agent confidence score is below CONFIDENCE_DOWNGRADE_THRESHOLD to UNCERTAIN.
+
+    This prevents a low-confidence "all clear" from silently bypassing the HITL gate.
+    Only fires when the overall pipeline uncertainty is HIGH — does not touch verdicts
+    when the system is reasonably confident.
+
+    Returns (adjusted_results, downgrade_count).
+    """
+    if uncertainty_verdict != "HIGH":
+        return compliance_results, 0
+
+    adjusted = []
+    downgrade_count = 0
+    for r in compliance_results:
+        if r.get("verdict") == "COMPATIBLE":
+            consumer   = r.get("consumer", "")
+            score_key  = f"contract_compliance_agent:{consumer}"
+            confidence = agent_confidence_scores.get(score_key, 1.0)
+            if confidence < CONFIDENCE_DOWNGRADE_THRESHOLD:
+                r = {
+                    **r,
+                    "verdict":   "UNCERTAIN",
+                    "reasoning": (
+                        f"[Downgraded COMPATIBLE → UNCERTAIN — agent confidence "
+                        f"{confidence:.2f} < threshold {CONFIDENCE_DOWNGRADE_THRESHOLD}] "
+                        + r.get("reasoning", "")
+                    ),
+                }
+                downgrade_count += 1
+        adjusted.append(r)
+
+    return adjusted, downgrade_count
+
+
 def compute_deterministic_confidence(
     graph_loaded: bool,
     consumer_count: int,

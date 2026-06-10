@@ -42,11 +42,10 @@ async def cross_repo_hitl_check(state: MicroservicePipelineState) -> dict:
     Evaluate whether cross-repo impact requires human review.
     Sets hitl_required and sends a Slack notification if so.
     """
-    impact_score       = state.get("impact_score", 0.0) or 0.0
-    breaking_consumers = sum(
-        1 for r in state.get("compliance_results", [])
-        if r.get("verdict") == "BREAKING"
-    )
+    impact_score = state.get("impact_score", 0.0) or 0.0
+    # Prefer adjusted verdicts (post-downgrade) when available
+    results = state.get("adjusted_compliance_results") or state.get("compliance_results", [])
+    breaking_consumers = sum(1 for r in results if r.get("verdict") == "BREAKING")
 
     uncertainty_score = state.get("uncertainty_score", 0.0) or 0.0
 
@@ -103,8 +102,8 @@ async def cross_repo_hitl_check(state: MicroservicePipelineState) -> dict:
         # Store Phase 3 summary now — Phase 4 will overwrite after approval.
         # Without this, ainvoke() returns state["summary"]=None when interrupted,
         # and the eval (and /runs API) cannot determine the BREAKING verdict.
-        compliance = state.get("compliance_results", [])
-        uncertain_count = sum(1 for r in compliance if r.get("verdict") == "UNCERTAIN")
+        compliance = state.get("adjusted_compliance_results") or state.get("compliance_results", [])
+        uncertain_count  = sum(1 for r in compliance if r.get("verdict") == "UNCERTAIN")
         compatible_count = sum(1 for r in compliance if r.get("verdict") == "COMPATIBLE")
         preliminary_summary = {
             "overall_verdict":    "BREAKING",
