@@ -86,13 +86,29 @@ class ContractComplianceAgent:
         self._llm = llm or _default_llm()
         self._log = logging.getLogger(f"agents.{self.NAME}")
 
-    async def run(self, consumer: str, contract_diff: dict, usage_patterns: dict) -> ComplianceResult:
+    async def run(
+        self,
+        consumer: str,
+        contract_diff: dict,
+        usage_patterns: dict,
+        hop_depth: int = 1,
+    ) -> ComplianceResult:
         """
         Check whether `contract_diff` breaks `consumer` given its `usage_patterns`.
+        hop_depth=1 means direct consumer; hop_depth>1 means transitive.
         """
         import json, re
+        transitivity_note = (
+            ""
+            if hop_depth == 1
+            else (
+                f"\nNote: {consumer} is a TRANSITIVE consumer at depth {hop_depth} "
+                f"(it depends on an intermediate service that depends on the provider). "
+                f"Its exposure to this change may be indirect — consider this in your verdict."
+            )
+        )
         prompt = (
-            f"Consumer service: {consumer}\n\n"
+            f"Consumer service: {consumer}{transitivity_note}\n\n"
             f"Contract diff (breaking changes only):\n{json.dumps(contract_diff, indent=2)}\n\n"
             f"Consumer usage patterns:\n{json.dumps(usage_patterns, indent=2)}"
         )

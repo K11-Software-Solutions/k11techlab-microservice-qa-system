@@ -96,6 +96,19 @@ class DependencyGraph:
         rev = self._g.reverse(copy=False)
         return list(rev.successors(provider))
 
+    def shortest_path_edges(self, source: str, target: str) -> list[dict]:
+        """
+        Return edge data dicts along the shortest path from source to target.
+        For a transitive consumer C in chain C→B→A, call with source=C, target=A
+        to get [edge_data(C→B), edge_data(B→A)].
+        Returns [] if no path exists or either node is missing.
+        """
+        try:
+            path = nx.shortest_path(self._g, source=source, target=target)
+        except (nx.NetworkXNoPath, nx.NodeNotFound, nx.exception.NetworkXError):
+            return []
+        return [dict(self._g.edges[u, v]) for u, v in zip(path[:-1], path[1:])]
+
     def impact_radius(self, provider: str) -> int:
         """Count of all affected downstream consumers."""
         return len(self.downstream_consumers(provider))

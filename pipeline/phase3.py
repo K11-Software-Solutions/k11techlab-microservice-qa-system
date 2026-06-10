@@ -78,6 +78,7 @@ async def validate_consumer_node(worker_state: dict) -> dict:
     mcp_clients   = worker_state.get("_mcp_clients")
 
     agent = ContractComplianceAgent(mcp_clients=mcp_clients)
+    hop_depth = consumer_ctx.get("hop_depth", 1)
     result = await agent.run(
         consumer=consumer_ctx["consumer"],
         contract_diff={"breaking_changes": breaking, "diff": contract_diff},
@@ -91,7 +92,9 @@ async def validate_consumer_node(worker_state: dict) -> dict:
             ],
             "edge_criticality":    consumer_ctx.get("edge_criticality", "medium"),
             "is_direct_consumer":  consumer_ctx.get("is_direct", True),
+            "hop_depth":           hop_depth,
         },
+        hop_depth=hop_depth,
     )
 
     # Violations bubble up to top-level state via list-append reducer
