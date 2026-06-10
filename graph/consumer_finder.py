@@ -22,11 +22,43 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, Union
 
 from graph.dependency_graph import ConsumptionEdge, DependencyGraph
 
 logger = logging.getLogger(__name__)
+
+
+def _normalise_specs(changed_endpoints: list) -> list[dict]:
+    """
+    Accept either flat strings or structured dicts and return a normalised list.
+
+    Accepted input forms:
+      - "GET /api/v2/users/{id}"   → {"pattern": "/api/v2/users/{id}", "methods": {"GET"}}
+      - "/api/v2/users/{id}"       → {"pattern": "/api/v2/users/{id}", "methods": set()}
+      - {"pattern": "...", "methods": ["GET"]}  → as-is with set conversion
+      - {"endpoint": "...", "method": "GET"}    → legacy Phase 1 dict form
+
+    An empty methods set means "match all methods" (backward-compatible behaviour).
+    """
+    specs = []
+    for ep in changed_endpoints:
+        if isinstance(ep, str):
+            parts = ep.split(" ", 1)
+            if len(parts) == 2 and parts[0].isupper() and "/" in parts[1]:
+                specs.append({"pattern": parts[1], "methods": {parts[0]}})
+            else:
+                specs.append({"pattern": ep, "methods": set()})
+        else:
+            pattern = ep.get("pattern") or ep.get("endpoint", "")
+            methods_raw = ep.get("methods") or (
+                [ep["method"]] if ep.get("method") else []
+            )
+            specs.append({
+                "pattern": pattern,
+                "methods": {m.upper() for m in methods_raw},
+            })
+    return specs
 
 
 @dataclass
@@ -45,50 +77,76 @@ class ConsumerContext:
 def find_affected_consumers(
     graph: DependencyGraph,
     provider: str,
-    changed_endpoints: list[str],
+    changed_endpoints: list,
 ) -> list[ConsumerContext]:
     """
     Return all consumers affected by changes to `provider`'s `changed_endpoints`.
 
-    For each consumer, includes:
-    - Whether it's a direct or transitive consumer
-    - Which specific endpoints it consumes that were changed
-    - Edge criticality label
-    - Team/Slack context for notifications
+    `changed_endpoints` accepts:
+      - flat strings: ["GET /api/v2/users/{id}", "/api/v1/orders/{id}"]
+      - structured dicts: [{"pattern": "/api/v2/users/{id}", "methods": ["GET"]}]
+      - legacy Phase 1 dicts: [{"endpoint": "/api/v2/users/{id}", "method": "GET"}]
+
+    A consumer is included only if its registered edge methods intersect with
+    the methods of the changed operation. An empty methods set in the spec
+    matches all methods (backward-compatible behaviour).
     """
     direct   = set(graph.direct_consumers(provider))
     all_down = set(graph.downstream_consumers(provider))
+    specs    = _normalise_specs(changed_endpoints)
+    crit_rank = {"critical": 3, "high": 2, "medium": 1, "low": 0}
 
     consumers: list[ConsumerContext] = []
 
     for consumer in all_down:
         node_data = graph._g.nodes.get(consumer, {})
 
-        # Find which changed endpoints this consumer actually calls
         consuming: list[str] = []
-        max_criticality = "low"
-        crit_rank = {"critical": 3, "high": 2, "medium": 1, "low": 0}
-
         all_methods: set[str] = set()
+        max_criticality = "low"
+
         for _, target, edge_data in graph._g.edges(consumer, data=True):
             if target != provider:
                 continue
-            ep_pattern = edge_data.get("endpoint_pattern", "")
-            for changed in changed_endpoints:
-                if ep_pattern and (ep_pattern in changed or changed in ep_pattern):
-                    consuming.append(changed)
-                    for m in edge_data.get("methods", ["GET"]):
-                        all_methods.add(m.upper())
-            edge_crit = edge_data.get("criticality", "medium")
+
+            ep_pattern   = edge_data.get("endpoint_pattern", "")
+            edge_methods = {m.upper() for m in edge_data.get("methods", ["GET"])}
+            edge_crit    = edge_data.get("criticality", "medium")
+
+            for spec in specs:
+                changed_pattern  = spec["pattern"]
+                changed_methods  = spec["methods"]
+
+                # Path must match (substring overlap)
+                if not (ep_pattern and (
+                    ep_pattern in changed_pattern or changed_pattern in ep_pattern
+                )):
+                    continue
+
+                # Method must intersect — empty changed_methods means match all
+                if changed_methods and not edge_methods.intersection(changed_methods):
+                    continue
+
+                consuming.append(changed_pattern)
+                all_methods.update(edge_methods)
+
             if crit_rank.get(edge_crit, 0) > crit_rank.get(max_criticality, 0):
                 max_criticality = edge_crit
+
+        if not consuming:
+            # No edges matched on both path AND method — consumer unaffected
+            logger.debug(
+                "Consumer %s skipped — no method+path overlap with changed endpoints",
+                consumer,
+            )
+            continue
 
         consumers.append(ConsumerContext(
             consumer=consumer,
             repo=node_data.get("repo", ""),
             team=node_data.get("team", ""),
             slack_channel=node_data.get("slack_channel", ""),
-            consuming_endpoints=consuming if consuming else changed_endpoints,
+            consuming_endpoints=consuming,
             edge_methods=sorted(all_methods) if all_methods else ["GET"],
             edge_criticality=max_criticality,
             is_direct=(consumer in direct),

@@ -68,9 +68,13 @@ class DependencyGraphAgent(BaseMicroserviceAgent):
                 self._log.warning("SQLite graph load also failed (%s) — using empty graph", exc)
                 graph = DependencyGraph()
 
-        # ── Identify changed endpoints ─────────────────────────────────────
+        # ── Identify changed endpoints (structured — preserves HTTP method) ──
         changed_endpoints = [
-            ep.get("endpoint", "") for ep in state.get("changed_endpoints", [])
+            {
+                "pattern": ep.get("endpoint", ""),
+                "methods": [ep["method"].upper()] if ep.get("method") else [],
+            }
+            for ep in state.get("changed_endpoints", [])
         ]
         if not changed_endpoints:
             # No contract changes — nothing to traverse
