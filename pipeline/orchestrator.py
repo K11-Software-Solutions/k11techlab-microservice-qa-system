@@ -31,6 +31,7 @@ from typing import Any
 
 from langgraph.graph import END, START, StateGraph
 
+from pipeline.confidence import aggregate_agent_confidence
 from pipeline.hitl import (
     cross_repo_hitl_check,
     cross_repo_human_review,
@@ -44,6 +45,20 @@ from pipeline.phase4 import phase4_app
 from pipeline.state import MicroservicePipelineState
 
 logger = logging.getLogger(__name__)
+
+
+async def aggregate_confidence_node(state: MicroservicePipelineState) -> dict:
+    """Aggregate per-agent confidence scores into a single uncertainty signal."""
+    scores  = state.get("agent_confidence_scores") or {}
+    summary = aggregate_agent_confidence(scores)
+    logger.info(
+        "Confidence aggregation — agents=%d mean=%.3f uncertainty=%.3f verdict=%s",
+        len(scores), summary.mean, summary.uncertainty_score, summary.verdict,
+    )
+    return {
+        "uncertainty_score":   summary.uncertainty_score,
+        "uncertainty_verdict": summary.verdict,
+    }
 
 
 def route_after_phase1(state: MicroservicePipelineState) -> str:
@@ -66,6 +81,9 @@ def build_orchestrator() -> StateGraph:
     builder.add_node("phase3", phase3_app)
     builder.add_node("phase4", phase4_app)
 
+    # ── Confidence aggregation node ───────────────────────────────────────
+    builder.add_node("aggregate_confidence", aggregate_confidence_node)
+
     # ── HITL gate nodes ───────────────────────────────────────────────────
     builder.add_node("hitl_check",         cross_repo_hitl_check)
     builder.add_node("human_review_gate",  cross_repo_human_review)
@@ -84,8 +102,9 @@ def build_orchestrator() -> StateGraph:
     # Phase 2 → Phase 3 (run compliance checks first so HITL has full consumer data)
     builder.add_edge("phase2", "phase3")
 
-    # Phase 3 → HITL check (breaking_consumers now populated from compliance_results)
-    builder.add_edge("phase3", "hitl_check")
+    # Phase 3 → confidence aggregation → HITL check
+    builder.add_edge("phase3", "aggregate_confidence")
+    builder.add_edge("aggregate_confidence", "hitl_check")
 
     # HITL check → human review (if required) or directly to phase4
     builder.add_conditional_edges(

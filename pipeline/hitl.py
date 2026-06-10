@@ -26,10 +26,12 @@ Pauses execution via interrupt() — resumes via graph.update_state().
 from __future__ import annotations
 
 import logging
+import os
 
 from langgraph.types import interrupt
 
 from analyzer.impact_scorer import BREAKING_CONSUMER_HITL_COUNT, IMPACT_HITL_THRESHOLD
+from pipeline.confidence import UNCERTAINTY_THRESHOLD
 from pipeline.state import MicroservicePipelineState
 
 logger = logging.getLogger(__name__)
@@ -46,6 +48,8 @@ async def cross_repo_hitl_check(state: MicroservicePipelineState) -> dict:
         if r.get("verdict") == "BREAKING"
     )
 
+    uncertainty_score = state.get("uncertainty_score", 0.0) or 0.0
+
     hitl_required = False
     hitl_reason   = ""
 
@@ -59,6 +63,14 @@ async def cross_repo_hitl_check(state: MicroservicePipelineState) -> dict:
         hitl_reason   = (
             f"{breaking_consumers} breaking consumer(s) >= "
             f"threshold {BREAKING_CONSUMER_HITL_COUNT}"
+        )
+    elif uncertainty_score >= UNCERTAINTY_THRESHOLD:
+        hitl_required = True
+        uncertainty_verdict = state.get("uncertainty_verdict", "HIGH")
+        hitl_reason   = (
+            f"Low agent confidence detected — uncertainty_score={uncertainty_score:.3f} "
+            f">= threshold {UNCERTAINTY_THRESHOLD} (verdict={uncertainty_verdict}). "
+            f"Human review required even though impact score is below threshold."
         )
 
     if hitl_required:
@@ -117,14 +129,16 @@ async def cross_repo_human_review(state: MicroservicePipelineState) -> dict:
     """
     logger.info("Awaiting cross-repo HITL decision — run_id=%s", state.get("run_id"))
     decision = interrupt({
-        "type":             "cross_repo_human_review",
-        "run_id":           state.get("run_id"),
-        "impact_score":     state.get("impact_score"),
-        "impact_radius":    state.get("impact_radius"),
-        "affected_services": state.get("affected_services", []),
-        "breaking_changes": state.get("breaking_changes", []),
-        "repo_name":        state.get("repo_name"),
-        "pr_number":        state.get("pr_number"),
+        "type":               "cross_repo_human_review",
+        "run_id":             state.get("run_id"),
+        "impact_score":       state.get("impact_score"),
+        "impact_radius":      state.get("impact_radius"),
+        "uncertainty_score":  state.get("uncertainty_score"),
+        "uncertainty_verdict": state.get("uncertainty_verdict"),
+        "affected_services":  state.get("affected_services", []),
+        "breaking_changes":   state.get("breaking_changes", []),
+        "repo_name":          state.get("repo_name"),
+        "pr_number":          state.get("pr_number"),
         "message": (
             "Cross-repo impact detected. Review breaking changes and decide "
             "whether to approve (provider may merge; consumers must adapt) "

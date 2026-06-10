@@ -116,6 +116,9 @@ async def validate_consumer_node(worker_state: dict) -> dict:
         }],
         "violations": violations,
         "errors": [result.error] if result.error else [],
+        "agent_confidence_scores": {
+            f"contract_compliance_agent:{result.consumer}": result.confidence
+        },
     }
 
 

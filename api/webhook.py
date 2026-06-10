@@ -220,11 +220,13 @@ async def get_run(run_id: str):
         raise HTTPException(status_code=404, detail=f"Run {run_id} not found")
     run = _runs[run_id]
     return {
-        "run_id":       run_id,
-        "status":       run["status"],
-        "summary":      run["state"].get("summary"),
-        "final_report": run["state"].get("final_report"),
-        "error":        run.get("error"),
+        "run_id":             run_id,
+        "status":             run["status"],
+        "summary":            run["state"].get("summary"),
+        "final_report":       run["state"].get("final_report"),
+        "uncertainty_score":  run["state"].get("uncertainty_score"),
+        "uncertainty_verdict": run["state"].get("uncertainty_verdict"),
+        "error":              run.get("error"),
     }
 
 

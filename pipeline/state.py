@@ -20,6 +20,10 @@ from typing import TypedDict, Optional, Annotated
 import operator
 
 
+def _merge_confidence_dicts(a: dict, b: dict) -> dict:
+    return {**a, **b}
+
+
 class MicroservicePipelineState(TypedDict):
     # ── Trigger inputs ───────────────────────────────────────────────────────
     run_id:         str
@@ -54,6 +58,11 @@ class MicroservicePipelineState(TypedDict):
     compliance_results: Annotated[list[dict], operator.add]
     violations:         Annotated[list[dict], operator.add]
     errors:             Annotated[list[str],  operator.add]
+
+    # ── Confidence propagation ───────────────────────────────────────────────
+    agent_confidence_scores: Annotated[dict[str, float], _merge_confidence_dicts]
+    uncertainty_score:   float   # 0.0 = certain, 1.0 = maximally uncertain
+    uncertainty_verdict: str     # "LOW" | "MEDIUM" | "HIGH"
 
     # ── Phase 4: Impact report ───────────────────────────────────────────────
     summary:        Optional[dict]
@@ -90,6 +99,7 @@ def initial_state(
         hitl_required=False, hitl_decision=None,
         hitl_reviewer=None, hitl_comment=None,
         compliance_results=[], violations=[], errors=[],
+        agent_confidence_scores={}, uncertainty_score=0.0, uncertainty_verdict="LOW",
         summary=None, final_report=None,
         github_issues=None, slack_sent=None,
         pipeline_version="1.0.0", triggered_by=triggered_by,

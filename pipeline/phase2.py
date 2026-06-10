@@ -29,15 +29,28 @@ import logging
 from langgraph.graph import END, START, StateGraph
 
 from agents.dependency_graph_agent import DependencyGraphAgent
+from pipeline.confidence import compute_deterministic_confidence
 from pipeline.state import MicroservicePipelineState
 
 logger = logging.getLogger(__name__)
 
 
 async def traverse_graph_node(state: MicroservicePipelineState) -> dict:
-    """Run DependencyGraphAgent."""
+    """Run DependencyGraphAgent and attach deterministic confidence score."""
     agent = DependencyGraphAgent(mcp_clients=state.get("_mcp_clients"))
-    return await agent.run(state)
+    result = await agent.run(state)
+
+    graph_loaded   = bool(result.get("dependency_graph"))
+    consumer_count = len(result.get("downstream_consumers", []))
+    error_occurred = bool(result.get("errors"))
+
+    confidence = compute_deterministic_confidence(
+        graph_loaded=graph_loaded,
+        consumer_count=consumer_count,
+        error_occurred=error_occurred,
+    )
+    result["agent_confidence_scores"] = {"dependency_graph_agent": confidence}
+    return result
 
 
 def build_phase2() -> StateGraph:
