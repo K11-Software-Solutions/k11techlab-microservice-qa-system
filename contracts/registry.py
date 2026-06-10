@@ -182,6 +182,21 @@ class ContractRegistry:
             rows = await cur.fetchall()
         return [_row_to_contract(dict(r)) for r in rows]
 
+    async def get_contract_history_since(
+        self,
+        service_name: str,
+        since_iso: str,
+    ) -> list[dict]:
+        """Return all contract records for service_name recorded at or after since_iso."""
+        async with self._db.execute(
+            """SELECT sha, version, recorded_at FROM contracts
+               WHERE service_name = ? AND recorded_at >= ?
+               ORDER BY id DESC""",
+            (service_name, since_iso),
+        ) as cur:
+            rows = await cur.fetchall()
+        return [dict(r) for r in rows]
+
     async def search_consumers(self, endpoint_pattern: str) -> list[str]:
         """
         Find services whose stored contracts consume a given endpoint pattern.

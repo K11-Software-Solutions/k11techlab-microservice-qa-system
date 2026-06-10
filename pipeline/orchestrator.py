@@ -31,7 +31,7 @@ from typing import Any
 
 from langgraph.graph import END, START, StateGraph
 
-from pipeline.confidence import aggregate_agent_confidence, downgrade_compatible_verdicts
+from pipeline.confidence import aggregate_agent_confidence, apply_drift_floor, downgrade_compatible_verdicts
 from pipeline.hitl import (
     cross_repo_hitl_check,
     cross_repo_human_review,
@@ -51,6 +51,42 @@ async def aggregate_confidence_node(state: MicroservicePipelineState) -> dict:
     """Aggregate per-agent confidence scores and apply verdict downgrade when uncertainty is HIGH."""
     scores  = state.get("agent_confidence_scores") or {}
     summary = aggregate_agent_confidence(scores)
+
+    # Raise uncertainty floor if contract drift is HIGH/CRITICAL (Feature 4)
+    adjusted_uncertainty = apply_drift_floor(
+        summary.uncertainty_score,
+        state.get("drift_report"),
+    )
+    if adjusted_uncertainty != summary.uncertainty_score:
+        drift = state.get("drift_report", {})
+        logger.warning(
+            "Drift floor applied — service=%s drift=%s floor=%.2f "
+            "uncertainty %.3f → %.3f",
+            drift.get("service", "?"), drift.get("drift_level", "?"),
+            drift.get("uncertainty_floor", 0.0),
+            summary.uncertainty_score, adjusted_uncertainty,
+        )
+        # Recompute verdict with floored score
+        from pipeline.confidence import UNCERTAINTY_THRESHOLD
+        if adjusted_uncertainty < 0.20:
+            summary = summary.__class__(
+                mean=summary.mean, minimum=summary.minimum,
+                variance=summary.variance,
+                uncertainty_score=adjusted_uncertainty, verdict="LOW",
+            )
+        elif adjusted_uncertainty < UNCERTAINTY_THRESHOLD:
+            summary = summary.__class__(
+                mean=summary.mean, minimum=summary.minimum,
+                variance=summary.variance,
+                uncertainty_score=adjusted_uncertainty, verdict="MEDIUM",
+            )
+        else:
+            summary = summary.__class__(
+                mean=summary.mean, minimum=summary.minimum,
+                variance=summary.variance,
+                uncertainty_score=adjusted_uncertainty, verdict="HIGH",
+            )
+
     logger.info(
         "Confidence aggregation — agents=%d mean=%.3f uncertainty=%.3f verdict=%s",
         len(scores), summary.mean, summary.uncertainty_score, summary.verdict,

@@ -126,6 +126,14 @@ async def cross_repo_human_review(state: MicroservicePipelineState) -> dict:
     Pause execution pending human decision.
     Resumes when graph.update_state() is called with the decision.
     """
+    drift = state.get("drift_report") or {}
+    if drift.get("drift_level") in ("HIGH", "CRITICAL"):
+        logger.warning(
+            "High contract drift for %s: %d changes in %d days (%.1f/week)",
+            state.get("repo_name", ""), drift.get("change_count", 0),
+            drift.get("window_days", 30), drift.get("change_velocity", 0.0),
+        )
+
     logger.info("Awaiting cross-repo HITL decision — run_id=%s", state.get("run_id"))
     decision = interrupt({
         "type":               "cross_repo_human_review",
@@ -134,6 +142,7 @@ async def cross_repo_human_review(state: MicroservicePipelineState) -> dict:
         "impact_radius":      state.get("impact_radius"),
         "uncertainty_score":  state.get("uncertainty_score"),
         "uncertainty_verdict": state.get("uncertainty_verdict"),
+        "drift_report":       drift or None,
         "affected_services":  state.get("affected_services", []),
         "breaking_changes":   state.get("breaking_changes", []),
         "repo_name":          state.get("repo_name"),

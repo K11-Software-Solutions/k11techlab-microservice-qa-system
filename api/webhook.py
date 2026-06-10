@@ -231,6 +231,7 @@ async def get_run(run_id: str):
             sum(1 for r in adjusted if "[Downgraded COMPATIBLE" in r.get("reasoning", ""))
             if adjusted else 0
         ),
+        "drift_report":        run["state"].get("drift_report"),
         "error":               run.get("error"),
     }
 

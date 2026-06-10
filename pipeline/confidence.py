@@ -129,6 +129,23 @@ def downgrade_compatible_verdicts(
     return adjusted, downgrade_count
 
 
+def apply_drift_floor(
+    uncertainty_score: float,
+    drift_report: dict | None,
+) -> float:
+    """
+    Raise uncertainty_score to the drift floor when contract velocity is HIGH/CRITICAL.
+
+    High-velocity services are statistically more likely to introduce breaking
+    changes. Ensuring a minimum uncertainty score means the pipeline treats them
+    with appropriate caution even when the current diff looks clean.
+    """
+    if not drift_report:
+        return uncertainty_score
+    floor = drift_report.get("uncertainty_floor", 0.0)
+    return max(uncertainty_score, floor)
+
+
 def compute_deterministic_confidence(
     graph_loaded: bool,
     consumer_count: int,
