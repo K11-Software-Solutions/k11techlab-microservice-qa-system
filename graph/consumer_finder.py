@@ -62,6 +62,14 @@ def _normalise_specs(changed_endpoints: list) -> list[dict]:
             methods_raw = ep.get("methods") or (
                 [ep["method"]] if ep.get("method") else []
             )
+            # Strip leading "METHOD " prefix from pattern if present
+            # (ContractExtractorAgent emits "GET /api/v2/users" in the endpoint field)
+            if pattern:
+                parts = pattern.split(" ", 1)
+                if len(parts) == 2 and parts[0].isupper() and "/" in parts[1]:
+                    if not methods_raw:
+                        methods_raw = [parts[0]]
+                    pattern = parts[1]
             specs.append({
                 "pattern": pattern,
                 "methods": {m.upper() for m in methods_raw},
@@ -84,6 +92,44 @@ class ConsumerContext:
 
 
 _CRIT_RANK = {"critical": 3, "high": 2, "medium": 1, "low": 0}
+
+
+def _paths_match(consumer_pattern: str, changed_pattern: str) -> bool:
+    """
+    True when consumer_pattern and changed_pattern refer to the same endpoint.
+
+    Rules (segment-by-segment, must have equal length):
+      - Both literal and equal   → match  (/users == /users)
+      - Both path parameters     → match  (/{id} == /{user_id})
+      - One literal, one param   → NO match (/search != /{id})
+
+    The last rule is critical: /api/v2/users/search and /api/v2/users/{id}
+    are different routes; a consumer of the by-id route is unaffected by
+    adding a /search route.
+
+    Examples:
+      /api/v2/users           vs /api/v2/users            True
+      /api/v2/users/{id}      vs /api/v2/users/{user_id}  True
+      /api/v2/users/{id}      vs /api/v2/users/search     False
+      /api/v2/users           vs /api/v2/users/search     False  (depth)
+      /api/v2/users/{id}      vs /api/v2/users            False  (depth)
+    """
+    def _segs(p: str) -> list[str]:
+        return [s for s in p.split("/") if s]
+
+    c_segs = _segs(consumer_pattern)
+    h_segs = _segs(changed_pattern)
+    if len(c_segs) != len(h_segs):
+        return False
+    for cs, hs in zip(c_segs, h_segs):
+        c_is_param = cs.startswith("{")
+        h_is_param = hs.startswith("{")
+        if c_is_param and h_is_param:
+            continue  # both path parameters — compatible templates
+        if cs == hs:
+            continue  # same literal segment
+        return False   # literal vs param or different literals
+    return True
 
 
 def _resolve_consumer_context(
@@ -122,9 +168,7 @@ def _resolve_consumer_context(
                 changed_pattern = spec["pattern"]
                 changed_methods = spec["methods"]
 
-                if not (ep_pattern and (
-                    ep_pattern in changed_pattern or changed_pattern in ep_pattern
-                )):
+                if not (ep_pattern and _paths_match(ep_pattern, changed_pattern)):
                     continue
                 if changed_methods and not edge_methods.intersection(changed_methods):
                     continue

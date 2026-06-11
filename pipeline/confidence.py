@@ -28,8 +28,11 @@ from __future__ import annotations
 
 import os
 import statistics
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Optional
 
+if TYPE_CHECKING:
+    from calibration.correlation import AgentCorrelationMatrix
 
 UNCERTAINTY_THRESHOLD = float(os.getenv("UNCERTAINTY_THRESHOLD", "0.35"))
 # Weights: (agent_uncertainty, optional_metric_1, optional_metric_2)
@@ -44,16 +47,26 @@ class ConfidenceSummary:
     mean: float
     minimum: float
     variance: float
-    uncertainty_score: float   # 1 - mean, adjusted for variance
-    verdict: str               # LOW / MEDIUM / HIGH
+    uncertainty_score: float        # drives HITL threshold comparison
+    verdict: str                    # LOW | MEDIUM | HIGH
+    effective_n: Optional[float] = field(default=None)    # n_eff when corr matrix available
+    correlation_adjusted: bool  = field(default=False)    # True when precision weighting applied
 
 
-def aggregate_agent_confidence(scores: dict[str, float]) -> ConfidenceSummary:
+def aggregate_agent_confidence(
+    scores: dict[str, float],
+    corr_matrix: "AgentCorrelationMatrix | None" = None,
+) -> ConfidenceSummary:
     """
     Given {agent_name: confidence_score}, compute aggregate uncertainty metrics.
 
-    uncertainty_score = (1 - mean) * 0.7 + variance * 0.3
-    This rises when mean confidence is low OR individual agents disagree.
+    Base formula (no correlation data):
+        uncertainty_score = (1 - mean) * 0.7 + variance * 0.3
+
+    With correlation matrix (Feature 7):
+        mean is replaced by the precision-weighted mean, which discounts
+        correlated agents and amplifies anti-correlated ones.  The raw
+        arithmetic mean is still stored on ConfidenceSummary for transparency.
     """
     vals = list(scores.values())
     if not vals:
@@ -62,11 +75,21 @@ def aggregate_agent_confidence(scores: dict[str, float]) -> ConfidenceSummary:
             uncertainty_score=1.0, verdict="HIGH",
         )
 
-    mean     = statistics.mean(vals)
+    raw_mean = statistics.mean(vals)
     minimum  = min(vals)
     variance = statistics.variance(vals) if len(vals) > 1 else 0.0
 
-    uncertainty_score = round((1 - mean) * 0.7 + variance * 0.3, 4)
+    # Precision-weighted mean when correlation structure is available
+    if corr_matrix is not None and len(vals) >= 2:
+        effective_mean       = corr_matrix.adjusted_mean(scores)
+        effective_n          = corr_matrix.effective_n()
+        correlation_adjusted = True
+    else:
+        effective_mean       = raw_mean
+        effective_n          = None
+        correlation_adjusted = False
+
+    uncertainty_score = round((1 - effective_mean) * 0.7 + variance * 0.3, 4)
     uncertainty_score = min(1.0, max(0.0, uncertainty_score))
 
     if uncertainty_score < 0.20:
@@ -77,11 +100,13 @@ def aggregate_agent_confidence(scores: dict[str, float]) -> ConfidenceSummary:
         verdict = "HIGH"
 
     return ConfidenceSummary(
-        mean=round(mean, 4),
+        mean=round(raw_mean, 4),          # always report raw mean for audit trail
         minimum=round(minimum, 4),
         variance=round(variance, 4),
         uncertainty_score=uncertainty_score,
         verdict=verdict,
+        effective_n=round(effective_n, 3) if effective_n is not None else None,
+        correlation_adjusted=correlation_adjusted,
     )
 
 

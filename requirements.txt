@@ -1,4 +1,6 @@
 # Core
+numpy>=1.26.0
+scikit-learn>=1.4.0
 langgraph>=0.2.0
 langchain>=0.3.0
 langchain-openai>=0.2.0

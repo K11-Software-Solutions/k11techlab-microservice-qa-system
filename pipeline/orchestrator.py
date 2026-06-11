@@ -49,8 +49,28 @@ logger = logging.getLogger(__name__)
 
 async def aggregate_confidence_node(state: MicroservicePipelineState) -> dict:
     """Aggregate per-agent confidence scores and apply verdict downgrade when uncertainty is HIGH."""
-    scores  = state.get("agent_confidence_scores") or {}
-    summary = aggregate_agent_confidence(scores)
+    scores = state.get("agent_confidence_scores") or {}
+
+    # Feature 7: load inter-agent correlation matrix for precision-weighted aggregation.
+    # Falls through to uniform weights silently when fewer than MIN_RUNS are available.
+    corr_matrix = None
+    import os as _os
+    if _os.getenv("CALIBRATION_ENABLED", "true").lower() != "false":
+        try:
+            from calibration.correlation import AgentCorrelationMatrix
+            from calibration.store import CalibrationStore, CALIBRATION_DB
+            async with CalibrationStore(CALIBRATION_DB) as _store:
+                corr_matrix = await AgentCorrelationMatrix.from_store(_store)
+        except Exception as _exc:
+            logger.debug("Correlation matrix unavailable (cold start or error): %s", _exc)
+
+    summary = aggregate_agent_confidence(scores, corr_matrix=corr_matrix)
+
+    if summary.correlation_adjusted:
+        logger.info(
+            "Precision-weighted aggregation — n_agents=%d n_eff=%.2f",
+            len(scores), summary.effective_n,
+        )
 
     # Raise uncertainty floor if contract drift is HIGH/CRITICAL (Feature 4)
     adjusted_uncertainty = apply_drift_floor(
@@ -106,6 +126,7 @@ async def aggregate_confidence_node(state: MicroservicePipelineState) -> dict:
     return {
         "uncertainty_score":           summary.uncertainty_score,
         "uncertainty_verdict":         summary.verdict,
+        "effective_n_agents":          summary.effective_n,
         "adjusted_compliance_results": adjusted if downgrade_count else None,
     }
 

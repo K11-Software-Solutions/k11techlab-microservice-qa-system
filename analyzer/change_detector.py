@@ -240,10 +240,26 @@ def _diff_response_schema(
             description=f"Response field '{field_name}' removed from {endpoint_key}",
         ))
 
-    # Response field type changed → breaking
+    # New optional field in response → non-breaking (consumers ignore unknown fields)
+    for field_name in set(head_props) - set(base_props):
+        changes.append(ContractChange(
+            change_type=NonBreakingChangeType.OPTIONAL_FIELD_ADDED,
+            is_breaking=False,
+            endpoint=endpoint_key,
+            field=field_name,
+            before="",
+            after=_schema_type(head_props[field_name]),
+            severity="low",
+            description=f"New optional field '{field_name}' added to response of {endpoint_key}",
+        ))
+
+    # Fields present in both — check type changes and enum changes
     for field_name in set(base_props) & set(head_props):
-        base_type = _schema_type(base_props[field_name])
-        head_type  = _schema_type(head_props[field_name])
+        base_field = base_props[field_name]
+        head_field  = head_props[field_name]
+
+        base_type = _schema_type(base_field)
+        head_type  = _schema_type(head_field)
         if base_type and head_type and base_type != head_type:
             changes.append(ContractChange(
                 change_type=BreakingChangeType.FIELD_TYPE_CHANGED,
@@ -257,6 +273,29 @@ def _diff_response_schema(
                     f"Response field '{field_name}' type changed "
                     f"from '{base_type}' to '{head_type}' in {endpoint_key}"
                 ),
+            ))
+
+        # Enum values changed — potentially breaking if consumers compare literals
+        base_enum = set(base_field.get("enum") or [])
+        head_enum  = set(head_field.get("enum") or [])
+        if base_enum and base_enum != head_enum:
+            removed_vals = base_enum - head_enum
+            is_breaking  = bool(removed_vals)
+            description  = (
+                f"Enum values for '{field_name}' changed: "
+                f"removed {sorted(removed_vals)}, now {sorted(head_enum)}"
+                if removed_vals else
+                f"Enum values for '{field_name}' expanded: added {sorted(head_enum - base_enum)}"
+            )
+            changes.append(ContractChange(
+                change_type=BreakingChangeType.INCOMPATIBLE_CHANGE,
+                is_breaking=is_breaking,
+                endpoint=endpoint_key,
+                field=field_name,
+                before=str(sorted(base_enum)),
+                after=str(sorted(head_enum)),
+                severity="medium" if is_breaking else "low",
+                description=description,
             ))
 
     # Field removed from required list → consumers relying on guaranteed value may get null

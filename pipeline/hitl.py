@@ -153,14 +153,22 @@ async def cross_repo_human_review(state: MicroservicePipelineState) -> dict:
             "or reject (provider must maintain backwards compatibility)."
         ),
     })
+    hitl_decision = decision.get("decision", "")
+    reviewer      = decision.get("reviewer", "unknown")
+    comment       = decision.get("comment", "")
+
     logger.info(
         "Cross-repo HITL decision: decision=%s reviewer=%s",
-        decision.get("decision"), decision.get("reviewer"),
+        hitl_decision, reviewer,
     )
+
+    # Record reviewer decision as calibration labels (Feature 6)
+    await _record_hitl_labels(state, hitl_decision, reviewer, comment)
+
     return {
-        "hitl_decision": decision.get("decision"),
-        "hitl_reviewer": decision.get("reviewer", "unknown"),
-        "hitl_comment":  decision.get("comment", ""),
+        "hitl_decision": hitl_decision,
+        "hitl_reviewer": reviewer,
+        "hitl_comment":  comment,
     }
 
 
@@ -170,6 +178,57 @@ def route_after_hitl(state: MicroservicePipelineState) -> str:
         return "proceed"
     decision = state.get("hitl_decision")
     return "proceed" if decision == "approve" else "reject"
+
+
+async def _record_hitl_labels(
+    state: MicroservicePipelineState,
+    hitl_decision: str,
+    reviewer: str,
+    comment: str,
+) -> None:
+    """
+    Persist reviewer decision as per-consumer calibration labels (Feature 6).
+
+    Label mapping:
+      approve/reject → correct for consumers with BREAKING verdict
+      override       → incorrect (false positive) for BREAKING verdicts
+    """
+    import os
+    calibration_enabled = os.getenv("CALIBRATION_ENABLED", "true").lower() != "false"
+    if not calibration_enabled:
+        return
+
+    run_id = state.get("run_id", "")
+    if not run_id:
+        return
+
+    results = (
+        state.get("adjusted_compliance_results")
+        or state.get("compliance_results", [])
+    )
+    if not results:
+        return
+
+    try:
+        from calibration.store import CalibrationStore, CALIBRATION_DB
+        async with CalibrationStore(CALIBRATION_DB) as store:
+            for result in results:
+                consumer = result.get("consumer", "")
+                if not consumer:
+                    continue
+                await store.record_hitl_outcome(
+                    run_id=run_id,
+                    consumer=consumer,
+                    hitl_decision=hitl_decision,
+                    reviewer=reviewer,
+                    comment=comment,
+                )
+        logger.info(
+            "HITL labels recorded for run %s: %d consumers decision=%s",
+            run_id, len(results), hitl_decision,
+        )
+    except Exception as exc:
+        logger.warning("Failed to record HITL calibration labels: %s", exc)
 
 
 async def pipeline_rejected(state: MicroservicePipelineState) -> dict:

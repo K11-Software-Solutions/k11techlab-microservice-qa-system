@@ -260,6 +260,7 @@ async def get_run(run_id: str):
         "final_report":        run["state"].get("final_report"),
         "uncertainty_score":   run["state"].get("uncertainty_score"),
         "uncertainty_verdict":  run["state"].get("uncertainty_verdict"),
+        "effective_n_agents":  run["state"].get("effective_n_agents"),
         "verdicts_downgraded": (
             sum(1 for r in adjusted if "[Downgraded COMPATIBLE" in r.get("reasoning", ""))
             if adjusted else 0
@@ -303,6 +304,42 @@ async def health():
     return {"status": "ok", "service": "k11techlab-microservice-qa-pipeline"}
 
 
+# ── Feature 7: Agent correlation matrix ──────────────────────────────────────
+
+@app.get("/calibration/agent-correlations")
+async def agent_correlations():
+    """
+    Return the current inter-agent confidence correlation matrix estimated from
+    historical calibration_log entries.
+
+    Requires at least CORR_MIN_RUNS (default 10) runs with resolved ground truth
+    to produce a result.  Before that threshold the system uses uniform weighting
+    (independence assumption) and this endpoint returns status='insufficient_data'.
+
+    Response fields:
+      status             — 'ok' | 'insufficient_data'
+      n_agents           — number of agents in the matrix
+      n_runs             — number of runs used to estimate the matrix
+      effective_n        — Kish effective sample size (1 ≤ n_eff ≤ n_agents)
+      agents             — ordered list of agent names
+      correlation_matrix — N×N Pearson correlation values
+      precision_weights  — minimum-variance combination weights per agent
+    """
+    from calibration.correlation import AgentCorrelationMatrix, MIN_RUNS
+    async with CalibrationStore(CALIBRATION_DB) as store:
+        matrix = await AgentCorrelationMatrix.from_store(store)
+    if matrix is None:
+        return {
+            "status":    "insufficient_data",
+            "min_runs":  MIN_RUNS,
+            "message":   (
+                f"Need at least {MIN_RUNS} complete runs with resolved ground truth. "
+                "Run  POST /calibration/resolve  or await CI ground-truth resolution."
+            ),
+        }
+    return {"status": "ok", **matrix.to_dict()}
+
+
 # ── Calibration endpoints ─────────────────────────────────────────────────────
 
 class ManualGroundTruth(BaseModel):
@@ -339,3 +376,74 @@ async def calibration_fetch_ci(background_tasks: BackgroundTasks):
             logger.info("CI ground-truth fetch complete: %s", counts)
     background_tasks.add_task(_run)
     return {"status": "started"}
+
+
+# ── Feature 6: Adaptive Confidence Recalibration ──────────────────────────────
+
+class RecalibrateRequest(BaseModel):
+    model_type: str = "isotonic"   # 'isotonic' | 'platt'
+    gt_source:  str | None = None  # optional filter (e.g. 'controlled', 'manual')
+
+
+@app.post("/calibration/recalibrate")
+async def calibration_recalibrate(body: RecalibrateRequest = RecalibrateRequest()):
+    """
+    Fit per-agent isotonic regression (or Platt scaling) models from all
+    accumulated labelled data (resolved ground truth + HITL reviewer decisions).
+
+    Returns before/after ECE per agent. Models are persisted in calibration.db
+    and loaded at inference time via GET /calibration/calibrated-confidence.
+
+    This is the Feature 6 online learning endpoint: call it after collecting
+    a batch of HITL decisions to update agent confidence calibration.
+    """
+    from calibration.recalibration import RecalibrationEngine
+    engine = RecalibrationEngine(model_type=body.model_type)
+    async with CalibrationStore(CALIBRATION_DB) as store:
+        results = await engine.fit_all(store)
+    return {
+        "model_type": body.model_type,
+        "agents": [
+            {
+                "agent":      r.agent,
+                "status":     r.status,
+                "n_samples":  r.n_samples,
+                "before_ece": round(r.before_ece, 4) if r.before_ece is not None else None,
+                "after_ece":  round(r.after_ece,  4) if r.after_ece  is not None else None,
+                "message":    r.message,
+            }
+            for r in results
+        ],
+    }
+
+
+@app.get("/calibration/calibrated-confidence")
+async def calibration_transform(agent: str, raw: float, model_type: str = "isotonic"):
+    """
+    Apply the stored recalibration model for `agent` to `raw` confidence.
+    Returns the calibrated confidence value.
+
+    Example:
+        GET /calibration/calibrated-confidence?agent=contract_compliance_agent:k11-payment-service&raw=0.92
+        → {"agent": "...", "raw": 0.92, "calibrated": 0.71, "model_type": "isotonic"}
+    """
+    from calibration.recalibration import RecalibrationEngine
+    engine = RecalibrationEngine(model_type=model_type)
+    async with CalibrationStore(CALIBRATION_DB) as store:
+        loaded = await engine.load_all(store)
+    calibrated = engine.transform(agent, raw)
+    return {
+        "agent":      agent,
+        "raw":        raw,
+        "calibrated": round(calibrated, 4),
+        "model_type": model_type,
+        "model_loaded": engine.has_model(agent),
+    }
+
+
+@app.get("/calibration/models")
+async def calibration_models():
+    """List all stored recalibration models with before/after ECE."""
+    async with CalibrationStore(CALIBRATION_DB) as store:
+        models = await store.list_models()
+    return {"models": models}

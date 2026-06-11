@@ -88,6 +88,35 @@ class CalibrationStore:
         await self._conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_gt ON calibration_log(ground_truth)"
         )
+        # HITL outcome labels — one row per (run_id, consumer) reviewer decision
+        await self._conn.execute("""
+            CREATE TABLE IF NOT EXISTS hitl_outcomes (
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                run_id          TEXT    NOT NULL,
+                consumer        TEXT    NOT NULL,
+                hitl_decision   TEXT    NOT NULL,  -- 'approve' | 'override' | 'reject'
+                reviewer        TEXT    NOT NULL DEFAULT 'unknown',
+                comment         TEXT    NOT NULL DEFAULT '',
+                recorded_at     TEXT    NOT NULL,
+                UNIQUE(run_id, consumer)
+            )
+        """)
+        await self._conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_hitl_run ON hitl_outcomes(run_id)"
+        )
+        # Serialised per-agent recalibration models (isotonic or Platt)
+        await self._conn.execute("""
+            CREATE TABLE IF NOT EXISTS calibration_models (
+                agent           TEXT    NOT NULL,
+                model_type      TEXT    NOT NULL,  -- 'isotonic' | 'platt'
+                model_data      BLOB    NOT NULL,  -- pickled sklearn object
+                n_samples       INTEGER NOT NULL DEFAULT 0,
+                before_ece      REAL,
+                after_ece       REAL,
+                trained_at      TEXT    NOT NULL,
+                PRIMARY KEY (agent, model_type)
+            )
+        """)
         await self._conn.commit()
 
     async def record_run(
@@ -198,6 +227,128 @@ class CalibrationStore:
         ) as cursor:
             rows = await cursor.fetchall()
         return [dict(r) for r in rows]
+
+    async def record_hitl_outcome(
+        self,
+        run_id: str,
+        consumer: str,
+        hitl_decision: str,
+        reviewer: str = "unknown",
+        comment: str = "",
+    ) -> None:
+        """
+        Record a reviewer's HITL decision for one consumer in a run.
+
+        hitl_decision:
+          'approve'  — reviewer confirms the change is (or may be) breaking;
+                       BREAKING verdicts for this consumer are treated as correct.
+          'override' — reviewer says the change is actually compatible;
+                       BREAKING verdicts are treated as incorrect (false positive).
+          'reject'   — reviewer rejected the whole PR at the run level; treated
+                       same as 'approve' for per-consumer labelling.
+        """
+        now = datetime.now(timezone.utc).isoformat()
+        await self._conn.execute(
+            """INSERT OR REPLACE INTO hitl_outcomes
+               (run_id, consumer, hitl_decision, reviewer, comment, recorded_at)
+               VALUES (?,?,?,?,?,?)""",
+            (run_id, consumer, hitl_decision, reviewer, comment, now),
+        )
+        await self._conn.commit()
+        logger.info(
+            "HITL outcome recorded: run=%s consumer=%s decision=%s reviewer=%s",
+            run_id, consumer, hitl_decision, reviewer,
+        )
+
+    async def get_hitl_labels(self) -> list[dict]:
+        """
+        Return all HITL-labelled rows joined with calibration_log confidence scores.
+        Used as training data for recalibration when explicit ground truth is sparse.
+
+        Label mapping:
+          approve/reject → correct = 1  (BREAKING verdict was appropriate)
+          override       → correct = 0  (BREAKING verdict was a false positive)
+        """
+        async with self._conn.execute(
+            """SELECT cl.agent, cl.consumer, cl.confidence, cl.verdict,
+                      ho.hitl_decision,
+                      CASE ho.hitl_decision
+                          WHEN 'override' THEN 0 ELSE 1
+                      END AS correct
+               FROM hitl_outcomes ho
+               JOIN calibration_log cl
+                 ON cl.run_id = ho.run_id AND cl.consumer = ho.consumer"""
+        ) as cursor:
+            rows = await cursor.fetchall()
+        return [dict(r) for r in rows]
+
+    async def save_model(
+        self,
+        agent: str,
+        model_type: str,
+        model_data: bytes,
+        n_samples: int,
+        before_ece: float | None,
+        after_ece: float | None,
+    ) -> None:
+        """Persist a serialised sklearn calibration model for an agent."""
+        now = datetime.now(timezone.utc).isoformat()
+        await self._conn.execute(
+            """INSERT OR REPLACE INTO calibration_models
+               (agent, model_type, model_data, n_samples, before_ece, after_ece, trained_at)
+               VALUES (?,?,?,?,?,?,?)""",
+            (agent, model_type, model_data, n_samples, before_ece, after_ece, now),
+        )
+        await self._conn.commit()
+        logger.info(
+            "Calibration model saved: agent=%s type=%s n=%d ece %.4f→%.4f",
+            agent, model_type, n_samples,
+            before_ece or 0.0, after_ece or 0.0,
+        )
+
+    async def load_model(self, agent: str, model_type: str = "isotonic") -> bytes | None:
+        """Return pickled model bytes or None if no model exists for this agent."""
+        async with self._conn.execute(
+            "SELECT model_data FROM calibration_models WHERE agent=? AND model_type=?",
+            (agent, model_type),
+        ) as cursor:
+            row = await cursor.fetchone()
+        return row["model_data"] if row else None
+
+    async def list_models(self) -> list[dict]:
+        """Summary of all stored calibration models."""
+        async with self._conn.execute(
+            """SELECT agent, model_type, n_samples, before_ece, after_ece, trained_at
+               FROM calibration_models ORDER BY agent, model_type"""
+        ) as cursor:
+            rows = await cursor.fetchall()
+        return [dict(r) for r in rows]
+
+    async def get_agent_scores_matrix(self) -> list[dict]:
+        """
+        Return one entry per run: {run_id, agent_scores: {agent: confidence}}.
+
+        Used by AgentCorrelationMatrix to build the N×N covariance matrix from
+        historical calibration_log entries.  Only rows with a resolved ground
+        truth are included so noisy/unvalidated runs don't corrupt the estimate.
+        """
+        async with self._conn.execute(
+            """SELECT run_id, agent, confidence
+               FROM calibration_log
+               WHERE ground_truth != 'UNKNOWN' AND gt_source != 'pending'
+               ORDER BY run_id, agent"""
+        ) as cursor:
+            rows = await cursor.fetchall()
+
+        # Pivot: {run_id: {agent: confidence}}
+        runs: dict[str, dict[str, float]] = {}
+        for row in rows:
+            runs.setdefault(row["run_id"], {})[row["agent"]] = float(row["confidence"])
+
+        return [
+            {"run_id": run_id, "agent_scores": agent_scores}
+            for run_id, agent_scores in runs.items()
+        ]
 
     async def stats(self) -> dict:
         """Summary counts for reporting."""

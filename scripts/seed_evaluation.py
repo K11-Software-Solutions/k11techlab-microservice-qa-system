@@ -164,15 +164,14 @@ def _apply_patch(base_spec: dict, patch: dict) -> dict:
         })
         spec["info"]["version"] = "1.1.0"
 
-    # Rename all /api/v2/ paths to /api/v3/
+    # Rename all /api/<old>/ paths to /api/<new>/  e.g. {"v2": "v3"}
     if "rename_paths" in patch:
-        old_v = patch["rename_paths"].get("v2", "v2")
-        new_v = patch["rename_paths"].get("v3", "v3") if "v3" not in patch["rename_paths"] else "v3"
-        new_paths = {}
-        for path_key, path_val in spec.get("paths", {}).items():
-            new_key = path_key.replace(f"/api/v{old_v}/", f"/api/v{new_v}/") if f"v{old_v}" in path_key else path_key
-            new_paths[new_key] = path_val
-        spec["paths"] = new_paths
+        for old_marker, new_marker in patch["rename_paths"].items():
+            new_paths = {}
+            for path_key, path_val in spec.get("paths", {}).items():
+                new_key = path_key.replace(f"/api/{old_marker}/", f"/api/{new_marker}/")
+                new_paths[new_key] = path_val
+            spec["paths"] = new_paths
         spec["info"]["version"] = "2.0.0"
 
     # Add optional property to User schema
