@@ -810,12 +810,21 @@ async def baseline_graph_diff_no_llm(scenario: Scenario, head_contract, base_con
 # ── Topology extension ─────────────────────────────────────────────────────────
 
 async def extend_topology():
-    """Add notification-svc → order-service transitive edge."""
+    """Add transitive edges for Feature 5 eval:
+      - notification-svc → order-service  (depth-1 for order-service changes)
+      - analytics-service → notification-svc  (depth-2 path through notification-svc)
+    """
     import os
-    from graph.dependency_graph import ConsumptionEdge
+    from graph.dependency_graph import ConsumptionEdge, ServiceNode
     from graph.graph_store import GraphStore
     db = os.getenv("GRAPH_STORE_DB", "dependency_graph.db")
     async with GraphStore(db) as store:
+        await store.add_service(ServiceNode(
+            name="k11-analytics-service",
+            repo="K11-Software-Solutions/k11-analytics-service",
+            team="analytics",
+            slack_channel="#team-analytics",
+        ))
         await store.record_consumption(ConsumptionEdge(
             consumer="k11-notification-svc",
             provider="k11-order-service",
@@ -823,7 +832,14 @@ async def extend_topology():
             methods=["GET"],
             criticality="medium",
         ))
-    log.info("Extended topology: k11-notification-svc → k11-order-service")
+        await store.record_consumption(ConsumptionEdge(
+            consumer="k11-analytics-service",
+            provider="k11-notification-svc",
+            endpoint_pattern="/api/v1/notifications/{id}",
+            methods=["GET"],
+            criticality="low",
+        ))
+    log.info("Extended topology: notification-svc→order-service, analytics-service→notification-svc")
 
 
 # ── Main eval loop ─────────────────────────────────────────────────────────────

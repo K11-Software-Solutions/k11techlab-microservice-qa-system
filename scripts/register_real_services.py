@@ -65,32 +65,39 @@ from analyzer.contract_extractor import extract_contract
 GITHUB_ORG = os.getenv("GITHUB_ORG", "K11-Software-Solutions")
 
 SERVICES = [
-    ServiceNode(name="k11-user-service",     repo="K11-Software-Solutions/k11-user-service",
-                team="platform",  slack_channel="#team-platform"),
-    ServiceNode(name="k11-order-service",    repo="K11-Software-Solutions/k11-order-service",
-                team="commerce",  slack_channel="#team-commerce"),
-    ServiceNode(name="k11-payment-service",  repo="K11-Software-Solutions/k11-payment-service",
-                team="payments",  slack_channel="#team-payments"),
-    ServiceNode(name="k11-notification-svc", repo="K11-Software-Solutions/k11-notification-svc",
-                team="comms",     slack_channel="#team-comms"),
+    ServiceNode(name="k11-user-service",       repo="K11-Software-Solutions/k11-user-service",
+                team="platform",   slack_channel="#team-platform"),
+    ServiceNode(name="k11-order-service",      repo="K11-Software-Solutions/k11-order-service",
+                team="commerce",   slack_channel="#team-commerce"),
+    ServiceNode(name="k11-payment-service",    repo="K11-Software-Solutions/k11-payment-service",
+                team="payments",   slack_channel="#team-payments"),
+    ServiceNode(name="k11-notification-svc",   repo="K11-Software-Solutions/k11-notification-svc",
+                team="comms",      slack_channel="#team-comms"),
+    # depth-2 transitive consumer: analytics → notification-svc → order-service
+    ServiceNode(name="k11-analytics-service",  repo="K11-Software-Solutions/k11-analytics-service",
+                team="analytics",  slack_channel="#team-analytics"),
 ]
 
 EDGES = [
     # order-service calls user-service to validate user on order creation
-    ConsumptionEdge("k11-order-service",    "k11-user-service",    "/api/v2/users/{id}",         ["GET"],  "high"),
+    ConsumptionEdge("k11-order-service",      "k11-user-service",    "/api/v2/users/{id}",           ["GET"],  "high"),
     # payment-service calls user-service for identity verification
-    ConsumptionEdge("k11-payment-service",  "k11-user-service",    "/api/v2/users/{id}",         ["GET"],  "critical"),
-    # payment-service calls order-service to validate the order
-    ConsumptionEdge("k11-payment-service",  "k11-order-service",   "/api/v1/orders/{id}",        ["GET"],  "critical"),
+    ConsumptionEdge("k11-payment-service",    "k11-user-service",    "/api/v2/users/{id}",           ["GET"],  "critical"),
+    # payment-service calls order-service to validate the order (GET) and create orders (POST)
+    ConsumptionEdge("k11-payment-service",    "k11-order-service",   "/api/v1/orders/{id}",          ["GET"],        "critical"),
+    ConsumptionEdge("k11-payment-service",    "k11-order-service",   "/api/v1/orders",               ["POST"],       "critical"),
     # notification-svc calls user-service for contact info
-    ConsumptionEdge("k11-notification-svc", "k11-user-service",    "/api/v2/users/{id}/contact", ["GET"],  "medium"),
+    ConsumptionEdge("k11-notification-svc",   "k11-user-service",    "/api/v2/users/{id}/contact",   ["GET"],  "medium"),
+    # analytics-service calls notification-svc for delivery event data (depth-2 path to order-service)
+    ConsumptionEdge("k11-analytics-service",  "k11-notification-svc", "/api/v1/notifications/{id}", ["GET"],  "low"),
 ]
 
 CONTRACT_PATHS = {
-    "k11-user-service":     "openapi.yaml",
-    "k11-order-service":    "openapi.yaml",
-    "k11-payment-service":  "openapi.yaml",
-    "k11-notification-svc": "openapi.yaml",
+    "k11-user-service":      "openapi.yaml",
+    "k11-order-service":     "openapi.yaml",
+    "k11-payment-service":   "openapi.yaml",
+    "k11-notification-svc":  "openapi.yaml",
+    "k11-analytics-service": "openapi.yaml",
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
