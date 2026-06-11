@@ -1,0 +1,86 @@
+[
+  {
+    "id": "s01-remove-email-breaking",
+    "provider": "K11-Software-Solutions/k11-user-service",
+    "branch": "eval/s01-remove-email-field",
+    "title": "BREAKING: Remove email field from User response schema",
+    "expected_verdict": "BREAKING",
+    "ground_truth_source": "controlled",
+    "description": "Removes the required 'email' property from the User schema. Consumers that read user.email for notifications, receipts, or account verification will break.",
+    "changed_endpoints": ["/api/v2/users/{id}", "/api/v2/users"],
+    "openapi_patch": {
+      "components.schemas.User.required": ["id", "name"],
+      "remove_property": "email"
+    }
+  },
+  {
+    "id": "s02-required-header-breaking",
+    "provider": "K11-Software-Solutions/k11-user-service",
+    "branch": "eval/s02-required-auth-header",
+    "title": "BREAKING: Add required X-Auth-Token header to GET /api/v2/users/{id}",
+    "expected_verdict": "BREAKING",
+    "ground_truth_source": "controlled",
+    "description": "Adds a required authentication header to the user lookup endpoint. All consumers calling this endpoint without the header will receive 401 responses.",
+    "changed_endpoints": ["/api/v2/users/{id}"],
+    "openapi_patch": {
+      "add_required_header": "X-Auth-Token"
+    }
+  },
+  {
+    "id": "s03-path-migration-breaking",
+    "provider": "K11-Software-Solutions/k11-user-service",
+    "branch": "eval/s03-api-v3-migration",
+    "title": "BREAKING: Migrate all endpoints from /api/v2/ to /api/v3/",
+    "expected_verdict": "BREAKING",
+    "ground_truth_source": "controlled",
+    "description": "Renames all API paths from /api/v2/users to /api/v3/users without providing a backward-compatible redirect. All consumers registered on v2 endpoints will receive 404.",
+    "changed_endpoints": ["/api/v2/users", "/api/v2/users/{id}", "/api/v2/users/{id}/contact"],
+    "openapi_patch": {
+      "rename_paths": {"v2": "v3"}
+    }
+  },
+  {
+    "id": "s04-add-optional-field-compatible",
+    "provider": "K11-Software-Solutions/k11-user-service",
+    "branch": "eval/s04-add-display-name",
+    "title": "COMPATIBLE: Add optional display_name field to User schema",
+    "expected_verdict": "COMPATIBLE",
+    "ground_truth_source": "controlled",
+    "description": "Adds an optional 'display_name' property to the User response schema. Existing consumers ignore unknown fields (standard REST practice) — no breakage.",
+    "changed_endpoints": ["/api/v2/users/{id}", "/api/v2/users"],
+    "openapi_patch": {
+      "add_optional_property": "display_name"
+    }
+  },
+  {
+    "id": "s05-new-endpoint-compatible",
+    "provider": "K11-Software-Solutions/k11-user-service",
+    "branch": "eval/s05-add-search-endpoint",
+    "title": "COMPATIBLE: Add new GET /api/v2/users/search endpoint",
+    "expected_verdict": "COMPATIBLE",
+    "ground_truth_source": "controlled",
+    "description": "Adds a new search endpoint. No existing consumer depends on this endpoint — purely additive change with zero impact on registered consumers.",
+    "changed_endpoints": ["/api/v2/users/search"],
+    "openapi_patch": {
+      "add_endpoint": "/api/v2/users/search"
+    }
+  },
+  {
+    "id": "s06-status-enum-ambiguous",
+    "provider": "K11-Software-Solutions/k11-user-service",
+    "branch": "eval/s06-status-enum-rename",
+    "title": "UNCERTAIN: Rename status enum values (active→enabled, inactive→disabled)",
+    "expected_verdict": "UNCERTAIN",
+    "ground_truth_source": "controlled",
+    "description": "Changes status enum from [active, inactive] to [enabled, disabled]. Whether this breaks consumers depends on whether they compare against literal string values. LLM should flag UNCERTAIN with low-to-medium confidence.",
+    "changed_endpoints": ["/api/v2/users/{id}", "/api/v2/users"],
+    "openapi_patch": {
+      "change_enum": {
+        "schema": "User",
+        "property": "status",
+        "from": ["active", "inactive"],
+        "to": ["enabled", "disabled"]
+      }
+    }
+  }
+]
