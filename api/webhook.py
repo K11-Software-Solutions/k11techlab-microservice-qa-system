@@ -49,6 +49,7 @@ from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Request
 from langgraph.checkpoint.memory import MemorySaver
 from pydantic import BaseModel
 
+from calibration.store import CALIBRATION_DB, CalibrationStore
 from graph.dependency_graph import ConsumptionEdge, ServiceNode
 from graph.graph_store import GraphStore
 from pipeline.orchestrator import microservice_builder
@@ -57,9 +58,10 @@ from pipeline.state import initial_state
 logger = logging.getLogger(__name__)
 
 # ── Config ────────────────────────────────────────────────────────────────────
-GITHUB_WEBHOOK_SECRET = os.getenv("GITHUB_WEBHOOK_SECRET", "")
-GRAPH_STORE_DB        = os.getenv("GRAPH_STORE_DB", "dependency_graph.db")
-PAPER1_PIPELINE_URL   = os.getenv("PAPER1_PIPELINE_URL", "")
+GITHUB_WEBHOOK_SECRET      = os.getenv("GITHUB_WEBHOOK_SECRET", "")
+GRAPH_STORE_DB             = os.getenv("GRAPH_STORE_DB", "dependency_graph.db")
+PAPER1_PIPELINE_URL        = os.getenv("PAPER1_PIPELINE_URL", "")
+CALIBRATION_ENABLED        = os.getenv("CALIBRATION_ENABLED", "true").lower() != "false"
 
 # ── In-memory run store (replace with Redis/DB in production) ─────────────────
 _runs: dict[str, dict] = {}
@@ -162,10 +164,41 @@ async def _run_pipeline(run_id: str, state: dict) -> None:
         _runs[run_id]["state"]  = final_state
         logger.info("Run %s completed — verdict=%s",
                     run_id, (final_state.get("summary") or {}).get("overall_verdict", "N/A"))
+        if CALIBRATION_ENABLED:
+            import asyncio
+            asyncio.create_task(_record_calibration(run_id, final_state))
     except Exception as exc:
         logger.exception("Run %s failed: %s", run_id, exc)
         _runs[run_id]["status"] = "failed"
         _runs[run_id]["error"]  = str(exc)
+
+
+async def _record_calibration(run_id: str, final_state: dict) -> None:
+    """Fire-and-forget: persist per-consumer confidence+verdict for calibration study."""
+    try:
+        results = (
+            final_state.get("adjusted_compliance_results")
+            or final_state.get("compliance_results", [])
+        )
+        if not results:
+            return
+        # Build hop_depth lookup from downstream_consumers state
+        hop_depths = {
+            c["consumer"]: c.get("hop_depth", 1)
+            for c in final_state.get("downstream_consumers", [])
+            if isinstance(c, dict)
+        }
+        async with CalibrationStore(CALIBRATION_DB) as store:
+            await store.record_run(
+                run_id=run_id,
+                repo_name=final_state.get("repo_name", ""),
+                pr_number=final_state.get("pr_number", 0),
+                compliance_results=results,
+                agent_confidence_scores=final_state.get("agent_confidence_scores", {}),
+                hop_depths=hop_depths,
+            )
+    except Exception as exc:
+        logger.warning("Calibration recording failed for run %s: %s", run_id, exc)
 
 
 async def _dispatch_paper1(payload: dict) -> None:
@@ -268,3 +301,41 @@ async def record_consumption(body: ConsumptionRecord):
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "k11techlab-microservice-qa-pipeline"}
+
+
+# ── Calibration endpoints ─────────────────────────────────────────────────────
+
+class ManualGroundTruth(BaseModel):
+    run_id:            str
+    consumer_verdicts: dict[str, str]   # {"k11-payment-service": "BREAKING", ...}
+
+
+@app.get("/calibration/stats")
+async def calibration_stats():
+    """Return summary counts from the calibration log."""
+    async with CalibrationStore(CALIBRATION_DB) as store:
+        return await store.stats()
+
+
+@app.post("/calibration/resolve")
+async def calibration_resolve(body: ManualGroundTruth):
+    """Manually supply ground-truth labels for a run (gt_source=manual)."""
+    from calibration.ground_truth import resolve_manual
+    async with CalibrationStore(CALIBRATION_DB) as store:
+        await resolve_manual(store, body.run_id, body.consumer_verdicts)
+    return {"run_id": body.run_id, "resolved": len(body.consumer_verdicts)}
+
+
+@app.post("/calibration/fetch-ci-ground-truth")
+async def calibration_fetch_ci(background_tasks: BackgroundTasks):
+    """
+    Trigger background CI-failure ground-truth resolution for all pending runs.
+    Returns immediately; resolution happens asynchronously.
+    """
+    from calibration.ground_truth import fetch_ci_ground_truth
+    async def _run():
+        async with CalibrationStore(CALIBRATION_DB) as store:
+            counts = await fetch_ci_ground_truth(store)
+            logger.info("CI ground-truth fetch complete: %s", counts)
+    background_tasks.add_task(_run)
+    return {"status": "started"}
