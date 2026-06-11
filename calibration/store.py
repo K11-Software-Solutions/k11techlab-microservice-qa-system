@@ -350,6 +350,37 @@ class CalibrationStore:
             for run_id, agent_scores in runs.items()
         ]
 
+    async def get_run_calibration_data(self) -> list[dict]:
+        """
+        Return one entry per resolved run for conformal threshold fitting (Feature 8).
+
+        Each entry: {run_id, agent_scores: {agent: confidence}, any_wrong: bool}
+
+        any_wrong = True when at least one consumer in the run received a verdict
+        that did not match its resolved ground truth.
+        """
+        async with self._conn.execute(
+            """SELECT run_id, agent, confidence, verdict, ground_truth
+               FROM calibration_log
+               WHERE ground_truth != 'UNKNOWN' AND gt_source != 'pending'
+               ORDER BY run_id, agent"""
+        ) as cursor:
+            rows = await cursor.fetchall()
+
+        runs: dict[str, dict] = {}
+        for row in rows:
+            run_id = row["run_id"]
+            if run_id not in runs:
+                runs[run_id] = {"agent_scores": {}, "any_wrong": False}
+            runs[run_id]["agent_scores"][row["agent"]] = float(row["confidence"])
+            if row["verdict"] != row["ground_truth"]:
+                runs[run_id]["any_wrong"] = True
+
+        return [
+            {"run_id": rid, "agent_scores": d["agent_scores"], "any_wrong": d["any_wrong"]}
+            for rid, d in runs.items()
+        ]
+
     async def stats(self) -> dict:
         """Summary counts for reporting."""
         async with self._conn.execute(

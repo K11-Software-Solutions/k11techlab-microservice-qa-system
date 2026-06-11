@@ -340,6 +340,68 @@ async def agent_correlations():
     return {"status": "ok", **matrix.to_dict()}
 
 
+# ── Feature 8: Conformal HITL threshold ──────────────────────────────────────
+
+@app.get("/calibration/conformal-threshold")
+async def conformal_threshold(alpha: float = 0.10):
+    """
+    Return the split-conformal HITL uncertainty threshold and its coverage guarantee.
+
+    The threshold τ is derived from the calibration set so that at most
+    alpha + 1/(n_wrong+1) fraction of incorrect-verdict runs escape the HITL gate
+    (marginal, finite-sample guarantee; Angelopoulos & Bates 2023).
+
+    Query params:
+      alpha  — target FNR level (default 0.10). Typical range 0.05–0.20.
+
+    Response fields:
+      status             — 'ok' | 'insufficient_data'
+      alpha              — requested FNR target
+      threshold          — τ (uncertainty_score >= τ triggers HITL)
+      n_calibration      — total resolved runs in calibration set
+      n_wrong            — runs with at least one incorrect verdict (used for fitting)
+      fnr_upper_bound    — guaranteed worst-case FNR = alpha + 1/(n_wrong+1)
+      coverage_guarantee — 1 - fnr_upper_bound (fraction of wrong runs caught)
+      static_threshold   — current hand-tuned UNCERTAINTY_THRESHOLD for comparison
+    """
+    from calibration.conformal import ConformalHITLThreshold, MIN_WRONG_SAMPLES
+    from pipeline.confidence import UNCERTAINTY_THRESHOLD
+
+    if not (0.0 < alpha < 1.0):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=422, detail="alpha must be in (0, 1)")
+
+    async with CalibrationStore(CALIBRATION_DB) as store:
+        run_data = await store.get_run_calibration_data()
+
+    from pipeline.confidence import aggregate_agent_confidence
+    pairs = [
+        (aggregate_agent_confidence(run["agent_scores"]).uncertainty_score, run["any_wrong"])
+        for run in run_data
+    ]
+
+    n_wrong = sum(1 for _, is_wrong in pairs if is_wrong)
+    if n_wrong < MIN_WRONG_SAMPLES:
+        return {
+            "status": "insufficient_data",
+            "min_wrong": MIN_WRONG_SAMPLES,
+            "n_wrong": n_wrong,
+            "message": (
+                f"Need at least {MIN_WRONG_SAMPLES} runs with incorrect verdicts. "
+                f"Currently have {n_wrong}. Pipeline uses static threshold "
+                f"{UNCERTAINTY_THRESHOLD} until threshold activates."
+            ),
+            "static_threshold": UNCERTAINTY_THRESHOLD,
+        }
+
+    ct = ConformalHITLThreshold.fit(pairs, alpha=alpha)
+    return {
+        "status": "ok",
+        "static_threshold": UNCERTAINTY_THRESHOLD,
+        **ct.to_dict(),
+    }
+
+
 # ── Calibration endpoints ─────────────────────────────────────────────────────
 
 class ManualGroundTruth(BaseModel):

@@ -37,6 +37,32 @@ from pipeline.state import MicroservicePipelineState
 logger = logging.getLogger(__name__)
 
 
+async def _get_effective_uncertainty_threshold() -> tuple[float, str]:
+    """
+    Return (threshold, description) for the uncertainty gate.
+
+    Uses the conformal threshold (Feature 8) when sufficient calibration data
+    exists; falls back to the static UNCERTAINTY_THRESHOLD env-var otherwise.
+    """
+    if os.getenv("CALIBRATION_ENABLED", "true").lower() == "false":
+        return UNCERTAINTY_THRESHOLD, f"static threshold {UNCERTAINTY_THRESHOLD}"
+    try:
+        from calibration.conformal import ConformalHITLThreshold
+        from calibration.store import CalibrationStore, CALIBRATION_DB
+        async with CalibrationStore(CALIBRATION_DB) as _store:
+            ct = await ConformalHITLThreshold.from_store(_store)
+        if ct is not None:
+            desc = (
+                f"conformal threshold {ct.threshold:.3f} "
+                f"(α={ct.alpha:.2f}, FNR≤{ct.fnr_upper_bound:.3f}, "
+                f"n_wrong={ct.n_wrong})"
+            )
+            return ct.threshold, desc
+    except Exception as exc:
+        logger.debug("Conformal threshold unavailable (cold start or error): %s", exc)
+    return UNCERTAINTY_THRESHOLD, f"static threshold {UNCERTAINTY_THRESHOLD}"
+
+
 async def cross_repo_hitl_check(state: MicroservicePipelineState) -> dict:
     """
     Evaluate whether cross-repo impact requires human review.
@@ -63,14 +89,16 @@ async def cross_repo_hitl_check(state: MicroservicePipelineState) -> dict:
             f"{breaking_consumers} breaking consumer(s) >= "
             f"threshold {BREAKING_CONSUMER_HITL_COUNT}"
         )
-    elif uncertainty_score >= UNCERTAINTY_THRESHOLD:
-        hitl_required = True
-        uncertainty_verdict = state.get("uncertainty_verdict", "HIGH")
-        hitl_reason   = (
-            f"Low agent confidence detected — uncertainty_score={uncertainty_score:.3f} "
-            f">= threshold {UNCERTAINTY_THRESHOLD} (verdict={uncertainty_verdict}). "
-            f"Human review required even though impact score is below threshold."
-        )
+    else:
+        unc_threshold, unc_desc = await _get_effective_uncertainty_threshold()
+        if uncertainty_score >= unc_threshold:
+            hitl_required = True
+            uncertainty_verdict = state.get("uncertainty_verdict", "HIGH")
+            hitl_reason = (
+                f"Low agent confidence detected — uncertainty_score={uncertainty_score:.3f} "
+                f">= {unc_desc} (verdict={uncertainty_verdict}). "
+                f"Human review required even though impact score is below threshold."
+            )
 
     if hitl_required:
         logger.warning(
