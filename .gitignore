@@ -6,3 +6,4 @@ eval/results.json
 eval/metrics.json
 eval/scenarios_manifest.json
 *.log
+calibration.db
