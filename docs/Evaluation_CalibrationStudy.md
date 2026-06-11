@@ -115,8 +115,28 @@ the `hop_depth` prompt annotation (Feature 5) as a necessary correction.
 
 ### Step 1 — Collect pipeline runs
 
-Deploy the webhook server and monitor real PRs. Calibration logging is
-automatic (`CALIBRATION_ENABLED=true`). Check progress:
+Use the replay script to run historical merged PRs through the pipeline
+without waiting for live events:
+
+```bash
+# Dry run first — list available PRs
+python scripts/replay_prs.py \
+    --repos org/service-a org/service-b org/service-c \
+    --limit 50 \
+    --dry-run
+
+# Full replay (populates calibration.db automatically)
+python scripts/replay_prs.py \
+    --repos org/service-a org/service-b org/service-c \
+    --limit 50 \
+    --max-age-days 90 \
+    --output replay_manifest.json
+```
+
+`replay_manifest.json` records `(run_id, pr_number, repo, merged_at, head_sha)`
+for every replayed PR — used when resolving ground truth in Step 2.
+
+Check collection progress:
 
 ```
 GET /calibration/stats

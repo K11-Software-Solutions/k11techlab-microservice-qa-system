@@ -7,3 +7,4 @@ eval/metrics.json
 eval/scenarios_manifest.json
 *.log
 calibration.db
+replay_manifest.json
