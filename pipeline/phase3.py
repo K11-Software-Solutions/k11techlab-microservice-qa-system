@@ -29,10 +29,20 @@ from typing import Any
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import Send
 
+import os
+
 from agents.contract_compliance_agent import ContractComplianceAgent
 from pipeline.state import MicroservicePipelineState
 
 logger = logging.getLogger(__name__)
+
+# Feature 5 — Transitive Confidence Decay
+# Each additional hop introduces propagation uncertainty:
+#   depth 1 (direct):  multiplier = 1.00  (unchanged)
+#   depth 2:           multiplier = DEPTH_DECAY^1
+#   depth 3:           multiplier = DEPTH_DECAY^2
+# Default 1.0 = no decay (backwards-compatible with Evals 1–5).
+DEPTH_DECAY: float = float(os.getenv("DEPTH_DECAY", "1.0"))
 
 
 # ── Fan-out dispatcher ────────────────────────────────────────────────────────
@@ -103,24 +113,41 @@ async def validate_consumer_node(worker_state: dict) -> dict:
         for v in result.violations
     ]
 
-    logger.info(
-        "Consumer %s: verdict=%s violations=%d confidence=%.2f",
-        result.consumer, result.verdict, len(violations), result.confidence,
-    )
+    # Apply transitive decay: each intermediate hop reduces effective confidence.
+    # The original confidence is preserved in compliance_results for reviewers;
+    # the decayed value enters uncertainty aggregation.
+    decay_multiplier = DEPTH_DECAY ** max(0, hop_depth - 1)
+    decayed_confidence = result.confidence * decay_multiplier
+
+    if decay_multiplier < 1.0:
+        logger.info(
+            "Consumer %s: verdict=%s violations=%d confidence=%.2f "
+            "(depth=%d decay=%.2f → effective=%.2f)",
+            result.consumer, result.verdict, len(violations),
+            result.confidence, hop_depth, decay_multiplier, decayed_confidence,
+        )
+    else:
+        logger.info(
+            "Consumer %s: verdict=%s violations=%d confidence=%.2f",
+            result.consumer, result.verdict, len(violations), result.confidence,
+        )
 
     return {
-        "compliance_results": [result.__dict__ if hasattr(result, "__dict__") else {
-            "consumer":   result.consumer,
-            "verdict":    result.verdict,
-            "violations": result.violations,
-            "reasoning":  result.reasoning,
-            "confidence": result.confidence,
-            "error":      result.error,
+        "compliance_results": [{
+            "consumer":          result.consumer,
+            "verdict":           result.verdict,
+            "violations":        result.violations,
+            "reasoning":         result.reasoning,
+            "confidence":        result.confidence,        # original — for display/calibration
+            "confidence_decayed": decayed_confidence,      # decay-adjusted — informational
+            "hop_depth":         hop_depth,
+            "error":             result.error,
         }],
         "violations": violations,
         "errors": [result.error] if result.error else [],
         "agent_confidence_scores": {
-            f"contract_compliance_agent:{result.consumer}": result.confidence
+            # Decayed confidence feeds uncertainty aggregation (Feature 5)
+            f"contract_compliance_agent:{result.consumer}": decayed_confidence
         },
     }
 
