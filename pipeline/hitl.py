@@ -94,10 +94,13 @@ async def cross_repo_hitl_check(state: MicroservicePipelineState) -> dict:
         if uncertainty_score >= unc_threshold:
             hitl_required = True
             uncertainty_verdict = state.get("uncertainty_verdict", "HIGH")
+            unc_classifications = state.get("uncertainty_classifications") or {}
+            unc_summary = _format_classification_summary(unc_classifications)
             hitl_reason = (
                 f"Low agent confidence detected — uncertainty_score={uncertainty_score:.3f} "
-                f">= {unc_desc} (verdict={uncertainty_verdict}). "
-                f"Human review required even though impact score is below threshold."
+                f">= {unc_desc} (verdict={uncertainty_verdict})"
+                + (f". Source: {unc_summary}" if unc_summary else "")
+                + ". Human review required even though impact score is below threshold."
             )
 
     if hitl_required:
@@ -149,6 +152,23 @@ async def cross_repo_hitl_check(state: MicroservicePipelineState) -> dict:
     return {"hitl_required": False}
 
 
+def _format_classification_summary(classifications: dict) -> str:
+    """One-line summary of uncertainty types for the HITL reason string."""
+    if not classifications:
+        return ""
+    counts: dict[str, int] = {}
+    for c in classifications.values():
+        counts[c.get("type", "UNCLASSIFIED")] = counts.get(c.get("type", "UNCLASSIFIED"), 0) + 1
+    parts = []
+    if counts.get("DATA_UNCERTAINTY"):
+        parts.append(f"{counts['DATA_UNCERTAINTY']}×DATA")
+    if counts.get("SCOPE_UNCERTAINTY"):
+        parts.append(f"{counts['SCOPE_UNCERTAINTY']}×SCOPE")
+    if counts.get("UNCLASSIFIED"):
+        parts.append(f"{counts['UNCLASSIFIED']}×UNCLASSIFIED")
+    return ", ".join(parts)
+
+
 async def cross_repo_human_review(state: MicroservicePipelineState) -> dict:
     """
     Pause execution pending human decision.
@@ -170,6 +190,7 @@ async def cross_repo_human_review(state: MicroservicePipelineState) -> dict:
         "impact_radius":      state.get("impact_radius"),
         "uncertainty_score":  state.get("uncertainty_score"),
         "uncertainty_verdict": state.get("uncertainty_verdict"),
+        "uncertainty_classifications": state.get("uncertainty_classifications") or {},
         "drift_report":       drift or None,
         "affected_services":  state.get("affected_services", []),
         "breaking_changes":   state.get("breaking_changes", []),

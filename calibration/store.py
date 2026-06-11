@@ -117,6 +117,22 @@ class CalibrationStore:
                 PRIMARY KEY (agent, model_type)
             )
         """)
+        # Uncertainty source classifications (DATA/SCOPE per consumer, Feature 9)
+        await self._conn.execute("""
+            CREATE TABLE IF NOT EXISTS uncertainty_classifications (
+                id            INTEGER PRIMARY KEY AUTOINCREMENT,
+                run_id        TEXT    NOT NULL,
+                consumer      TEXT    NOT NULL,
+                unc_type      TEXT    NOT NULL DEFAULT 'UNCLASSIFIED',
+                reason        TEXT    NOT NULL DEFAULT '',
+                confidence    REAL    NOT NULL DEFAULT 0.0,
+                classified_at TEXT    NOT NULL,
+                UNIQUE(run_id, consumer)
+            )
+        """)
+        await self._conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_unc_run ON uncertainty_classifications(run_id)"
+        )
         await self._conn.commit()
 
     async def record_run(
@@ -380,6 +396,60 @@ class CalibrationStore:
             {"run_id": rid, "agent_scores": d["agent_scores"], "any_wrong": d["any_wrong"]}
             for rid, d in runs.items()
         ]
+
+    async def record_uncertainty_classifications(
+        self,
+        run_id: str,
+        classifications: dict,   # consumer → UncertaintyClassification
+    ) -> int:
+        """Persist uncertainty source classifications. Returns number of rows inserted."""
+        from datetime import datetime, timezone
+        now = datetime.now(timezone.utc).isoformat()
+        rows = [
+            (run_id, c.consumer, c.unc_type.value, c.reason, c.confidence, now)
+            for c in classifications.values()
+        ]
+        if rows:
+            await self._conn.executemany(
+                """INSERT OR REPLACE INTO uncertainty_classifications
+                   (run_id, consumer, unc_type, reason, confidence, classified_at)
+                   VALUES (?,?,?,?,?,?)""",
+                rows,
+            )
+            await self._conn.commit()
+        return len(rows)
+
+    async def get_uncertainty_source_stats(self) -> dict:
+        """
+        Returns aggregate counts of DATA_UNCERTAINTY and SCOPE_UNCERTAINTY
+        across all classified runs, plus per-consumer breakdown.
+        """
+        async with self._conn.execute(
+            """SELECT unc_type, COUNT(*) as cnt
+               FROM uncertainty_classifications
+               GROUP BY unc_type"""
+        ) as cur:
+            type_rows = await cur.fetchall()
+
+        async with self._conn.execute(
+            """SELECT consumer, unc_type, COUNT(*) as cnt
+               FROM uncertainty_classifications
+               GROUP BY consumer, unc_type
+               ORDER BY consumer, unc_type"""
+        ) as cur:
+            consumer_rows = await cur.fetchall()
+
+        totals = {row["unc_type"]: row["cnt"] for row in type_rows}
+        per_consumer: dict[str, dict] = {}
+        for row in consumer_rows:
+            per_consumer.setdefault(row["consumer"], {})[row["unc_type"]] = row["cnt"]
+
+        total_classified = sum(totals.values())
+        return {
+            "total_classified": total_classified,
+            "totals": totals,
+            "per_consumer": per_consumer,
+        }
 
     async def stats(self) -> dict:
         """Summary counts for reporting."""

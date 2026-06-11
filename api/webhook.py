@@ -402,6 +402,24 @@ async def conformal_threshold(alpha: float = 0.10):
     }
 
 
+# ── Feature 9: Uncertainty source stats ──────────────────────────────────────
+
+@app.get("/calibration/uncertainty-sources")
+async def uncertainty_sources():
+    """
+    Return aggregate counts of DATA_UNCERTAINTY vs SCOPE_UNCERTAINTY across
+    all classified pipeline runs, plus a per-consumer breakdown.
+
+    Response fields:
+      total_classified  — total (run, consumer) rows classified
+      totals            — {DATA_UNCERTAINTY: N, SCOPE_UNCERTAINTY: N, UNCLASSIFIED: N}
+      per_consumer      — {consumer: {DATA_UNCERTAINTY: N, SCOPE_UNCERTAINTY: N}}
+    """
+    async with CalibrationStore(CALIBRATION_DB) as store:
+        stats = await store.get_uncertainty_source_stats()
+    return stats
+
+
 # ── Calibration endpoints ─────────────────────────────────────────────────────
 
 class ManualGroundTruth(BaseModel):

@@ -64,6 +64,7 @@ class MicroservicePipelineState(TypedDict):
     uncertainty_score:   float           # 0.0 = certain, 1.0 = maximally uncertain
     uncertainty_verdict: str             # "LOW" | "MEDIUM" | "HIGH"
     effective_n_agents:  Optional[float] # Kish n_eff — None before first 10 runs (Feature 7)
+    uncertainty_classifications: Optional[dict]  # consumer → {type, reason, confidence} (Feature 9)
     adjusted_compliance_results: Optional[list[dict]]  # post-downgrade snapshot; None if no adjustment
     drift_report: Optional[dict]                        # DriftReport.to_dict() for the provider service
 
@@ -104,6 +105,7 @@ def initial_state(
         compliance_results=[], violations=[], errors=[],
         agent_confidence_scores={}, uncertainty_score=0.0, uncertainty_verdict="LOW",
         effective_n_agents=None, adjusted_compliance_results=None, drift_report=None,
+        uncertainty_classifications=None,
         summary=None, final_report=None,
         github_issues=None, slack_sent=None,
         pipeline_version="1.0.0", triggered_by=triggered_by,

@@ -131,6 +131,67 @@ async def aggregate_confidence_node(state: MicroservicePipelineState) -> dict:
     }
 
 
+async def classify_uncertainty_node(state: MicroservicePipelineState) -> dict:
+    """
+    Feature 9: classify DATA_UNCERTAINTY vs SCOPE_UNCERTAINTY for every
+    low-confidence consumer verdict.  Only fires when there are results with
+    confidence < UNCERTAINTY_THRESHOLD; skips silently otherwise.
+    """
+    import os as _os
+    from pipeline.confidence import UNCERTAINTY_THRESHOLD
+
+    results = state.get("adjusted_compliance_results") or state.get("compliance_results", [])
+    if not results:
+        return {"uncertainty_classifications": None}
+
+    # State stores compliance_results as dicts; wrap in a lightweight proxy.
+    from dataclasses import make_dataclass
+    _Result = make_dataclass("_R", ["consumer", "verdict", "confidence", "reasoning"])
+    result_objs = [
+        _Result(
+            consumer=r.get("consumer", ""),
+            verdict=r.get("verdict", "UNCERTAIN"),
+            confidence=r.get("confidence", 0.0),
+            reasoning=r.get("reasoning", ""),
+        )
+        for r in results
+        if isinstance(r, dict)
+    ]
+
+    try:
+        from agents.contract_compliance_agent import _default_llm
+        from pipeline.uncertainty_classifier import classify_all_low_confidence
+        llm = _default_llm()
+        classifications = await classify_all_low_confidence(result_objs, UNCERTAINTY_THRESHOLD, llm)
+    except Exception as exc:
+        logger.debug("Uncertainty classification skipped: %s", exc)
+        return {"uncertainty_classifications": None}
+
+    if not classifications:
+        return {"uncertainty_classifications": None}
+
+    run_id = state.get("run_id", "")
+    if run_id and _os.getenv("CALIBRATION_ENABLED", "true").lower() != "false":
+        try:
+            from calibration.store import CalibrationStore, CALIBRATION_DB
+            async with CalibrationStore(CALIBRATION_DB) as _store:
+                await _store.record_uncertainty_classifications(run_id, classifications)
+        except Exception as exc:
+            logger.debug("Failed to persist uncertainty classifications: %s", exc)
+
+    serialised = {consumer: c.to_dict() for consumer, c in classifications.items()}
+    if serialised:
+        from pipeline.uncertainty_classifier import UncertaintyType
+        counts = {t.value: sum(1 for c in classifications.values() if c.unc_type == t)
+                  for t in UncertaintyType if t != UncertaintyType.UNCLASSIFIED}
+        logger.info(
+            "Uncertainty classified: %d consumer(s) — %s",
+            len(serialised),
+            "  ".join(f"{k}={v}" for k, v in counts.items() if v),
+        )
+    return {"uncertainty_classifications": serialised if serialised else None}
+
+
 def route_after_phase1(state: MicroservicePipelineState) -> str:
     """Short-circuit if no contract changes were detected."""
     if not state.get("changed_endpoints"):
@@ -154,6 +215,9 @@ def build_orchestrator() -> StateGraph:
     # ── Confidence aggregation node ───────────────────────────────────────
     builder.add_node("aggregate_confidence", aggregate_confidence_node)
 
+    # ── Uncertainty source classification (Feature 9) ─────────────────────
+    builder.add_node("classify_uncertainty", classify_uncertainty_node)
+
     # ── HITL gate nodes ───────────────────────────────────────────────────
     builder.add_node("hitl_check",         cross_repo_hitl_check)
     builder.add_node("human_review_gate",  cross_repo_human_review)
@@ -172,9 +236,10 @@ def build_orchestrator() -> StateGraph:
     # Phase 2 → Phase 3 (run compliance checks first so HITL has full consumer data)
     builder.add_edge("phase2", "phase3")
 
-    # Phase 3 → confidence aggregation → HITL check
+    # Phase 3 → confidence aggregation → uncertainty classification → HITL check
     builder.add_edge("phase3", "aggregate_confidence")
-    builder.add_edge("aggregate_confidence", "hitl_check")
+    builder.add_edge("aggregate_confidence", "classify_uncertainty")
+    builder.add_edge("classify_uncertainty", "hitl_check")
 
     # HITL check → human review (if required) or directly to phase4
     builder.add_conditional_edges(
