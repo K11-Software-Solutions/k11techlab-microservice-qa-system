@@ -4,7 +4,7 @@
 scripts/replay_prs.py
 ──────────────────────
 Replay historical merged GitHub PRs through the pipeline to populate
-calibration.db for the Paper 3 evaluation study.
+calibration.db for the Paper 4 evaluation study.
 
 How it works
 ────────────
